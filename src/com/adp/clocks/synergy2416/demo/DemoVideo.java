@@ -3,8 +3,10 @@ package com.adp.clocks.synergy2416.demo;
 import java.io.File;
 import java.io.IOException;
 
-
 public class DemoVideo {
+	
+	private static JMPlayer jmplayer;
+	
 	public static void showVideo(){
 	 JMPlayer jmPlayer = new JMPlayer();
      // open a video file
@@ -16,6 +18,14 @@ public class DemoVideo {
 	}
      // set volume to 90%
      jmPlayer.setVolume(90); 
+	}
+	
+	public static void closeVideo() {
+		if (jmplayer != null){
+			if (jmplayer.isPlaying()) {
+				jmplayer.close();
+			}
+		}
 	}
 }
 //	public static void showVideo(){
