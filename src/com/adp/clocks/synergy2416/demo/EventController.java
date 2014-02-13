@@ -41,7 +41,7 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 	private CardLayout m_cards;
 	private JPanel m_cardPanel;
 	private WelcomeForm m_welcomeForm;
-	private FingerPrintDemoForm m_fingerPrintDemoForm;
+	private FingerPrintEnrollForm m_fingerPrintDemoForm;
 	private PlayVideoForm m_videoDemoPanel;
 	private ShowWebCamForm m_webCamDemoPanel;
 	private JLabel m_lblBackground;
@@ -110,12 +110,12 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 			m_cardPanel.setSize(320, 200);
 			m_cardPanel.setOpaque(false);
 			m_welcomeForm = new WelcomeForm();
-			m_fingerPrintDemoForm = new FingerPrintDemoForm();
-			//m_videoDemoPanel = new PlayVideoForm(m_frame);
-			//m_webCamDemoPanel = new ShowWebCamForm(m_frame);
+			m_fingerPrintDemoForm = new FingerPrintEnrollForm();
+			m_videoDemoPanel = new PlayVideoForm();
+			m_webCamDemoPanel = new ShowWebCamForm();
 			m_cardPanel.add(m_welcomeForm,"welcome");
-			//m_cardPanel.add(m_videoDemoPanel,"videoDemo");
-			//m_cardPanel.add(m_webCamDemoPanel,"webcamDemo");
+			m_cardPanel.add(m_videoDemoPanel,"videoDemo");
+			m_cardPanel.add(m_webCamDemoPanel,"webcamDemo");
 			m_cardPanel.add(m_fingerPrintDemoForm,"fpDemo");
 			m_frame.getContentPane().add(m_lblInstruction,BorderLayout.NORTH);
 			m_frame.getContentPane().add(m_cardPanel,BorderLayout.CENTER);
@@ -124,6 +124,7 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 			m_frame.toFront();
 			m_frame.setVisible(true);
 			System.out.println("Done initializing gui...");
+			MainWindow.successbuzzersound.start();
 	}
 	
 	private void hideCursor() {
@@ -215,20 +216,21 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 	{
 	    System.out.println("Loading WelcomeForm");
 	    m_cards.show(m_cardPanel, "welcome");
-	    new DemoSound("res/hello.wav").start();
-	    //m_frame.repaint();
+	    m_welcomeForm.requestFocusInWindow();
 	}
 	
 	public void loadPlayVideoForm()
 	{
 	    System.out.println("Loading Playing Video Form");
-	    //m_cards.show(m_cardPanel, "videoDemo");
+	    m_cards.show(m_cardPanel, "videoDemo");
+	    m_videoDemoPanel.requestFocusInWindow();
 	}
 	
 	public void loadShowWebCamForm()
 	{
 	    System.out.println("Loading WebCamForm");
-	    //m_cards.show(m_cardPanel, "webcamDemo");
+	    m_cards.show(m_cardPanel, "webcamDemo");
+	    m_webCamDemoPanel.requestFocusInWindow();
 	}
 	
 	public void loadLEDDemoForm()
@@ -242,6 +244,7 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 	    System.out.println("Loading FingerPrint Demo Form");
 	    m_cards.show(m_cardPanel, "fpDemo");
 	    m_fingerPrintDemoForm.setFocusable(true);
+	    m_fingerPrintDemoForm.requestFocusInWindow();
 	    m_fingerPrintDemoForm.goDemo();
 	    
 	}
@@ -280,10 +283,6 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 		case CLOCKSTATUS_WEBCAM:
 			System.out.println("LoadShowWebcamForm");
 			loadShowWebCamForm();
-			break;
-		case CLOCKSTATUS_LED:
-			System.out.println("Show LEDs");
-			loadLEDDemoForm();
 			break;
 		case CLOCKSTATUS_FINGERPRINT_ENROLL:
 			System.out.println("LoadFingerPrintDemoForm");

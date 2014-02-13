@@ -19,6 +19,15 @@ public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 8210857356700426265L;
 	private static EventController m_ec;
 	private static ClockEventDispatcher m_ced;
+	
+	public static DemoSound greetingsound = new DemoSound("res/hello.wav");
+	public static DemoSound enrollsound = new DemoSound("res/Enroll.wav");
+	public static DemoSound beepsound = new DemoSound("res/beep.wav");
+	public static DemoSound placefingersound = new DemoSound("res/fingerPlace.wav");
+	public static DemoSound placefingeragainsound = new DemoSound("res/fingerPlaceAgain.wav");
+	public static DemoSound keypadsound = new DemoSound("res/KeyAccept.wav");
+	public static DemoSound successbuzzersound = new DemoSound("res/SuccessBuzzer.wav");
+	
 	//private static FPU m_fpu = FPU.getInstance();
 
 	static void renderSplashFrame(Graphics2D g, int frame) {

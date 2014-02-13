@@ -52,14 +52,12 @@ public class ShowWebCamForm  extends JPanel implements CaptureCallback{
 	private FrameGrabber	frameGrabber;
 	private VideoFrame		lastVideoFrame;
 	private JLabel lblInstruction;
-	private MainWindow m_mw;
 
 	/**
 	 * Start a new GetSnapshot UI
 	 * @throws V4L4JException if there is a problem capturing from the given device
 	 */
-	public ShowWebCamForm(MainWindow mw){
-		this.m_mw = mw;
+	public ShowWebCamForm(){
 		device = (System.getProperty("test.device") != null) ? System.getProperty("test.device") : "/dev/video0"; 
 		width = (System.getProperty("test.width")!=null) ? Integer.parseInt(System.getProperty("test.width")) : 320;
 		height = (System.getProperty("test.height")!=null) ? Integer.parseInt(System.getProperty("test.height")) : 240;
@@ -67,13 +65,14 @@ public class ShowWebCamForm  extends JPanel implements CaptureCallback{
 		channel = (System.getProperty("test.channel")!=null) ? Integer.parseInt(System.getProperty("test.channel")) : 0;
 		lastVideoFrame = null;
 		
-		 this.setOpaque(true); //content panes must be opaque
+		 this.setOpaque(false); //content panes must be opaque
 //	     m_mw.getContentPane().removeAll();
 //	     m_mw.getContentPane().add(this);
 //		 ((JPanel)m_mw.getContentPane()).revalidate();
 //		 m_mw.repaint();
 
 		// initialise the video device and frame grabber
+		 initialize();
 
 	}
 	public void initialize(){
@@ -126,7 +125,7 @@ public class ShowWebCamForm  extends JPanel implements CaptureCallback{
 		lblInstruction.setAlignmentX(Component.CENTER_ALIGNMENT);
 		lblInstruction.setAlignmentY(Component.CENTER_ALIGNMENT);
 
-		lblInstruction.addKeyListener(new KeyListener(){
+		this.addKeyListener(new KeyListener(){
 
 			@Override
 			public void keyTyped(KeyEvent e) {
@@ -136,12 +135,14 @@ public class ShowWebCamForm  extends JPanel implements CaptureCallback{
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				System.out.println("Pressed"+KeyEvent.VK_ESCAPE +" " +e.getKeyCode());
+				System.out.println("Pressed"+" " +e.getKeyCode());
 				getSnapshot();
+				ShowWebCamForm.this.setVisible(true);
 				
 				if(KeyEvent.VK_ESCAPE == e.getKeyCode()){
 					System.out.println("Cam Closed");
-					//this.setVisible(false);
+					ShowWebCamForm.this.setVisible(false);
+					//ShowWebCamForm.this.cleanupCapture();
 					//MainWindow.btnNewButton.requestFocus();
 				}
 			}
@@ -156,9 +157,6 @@ public class ShowWebCamForm  extends JPanel implements CaptureCallback{
 
 		add(lblInstruction);
 		add(Box.createGlue());
-		//frame.getContentPane().add(button);
-		lblInstruction.requestFocus();
-		//MainDemo.btnNewButton.requestFocus();
 	}
 
 	/**
@@ -167,6 +165,7 @@ public class ShowWebCamForm  extends JPanel implements CaptureCallback{
 	 */
 	private void getSnapshot() {
 		VideoFrame lastFrameCopy = null;
+		//System.out.println("get one snapshot...");
 		
 		synchronized (this) {
 			// If there is a current frame ...
@@ -183,6 +182,7 @@ public class ShowWebCamForm  extends JPanel implements CaptureCallback{
 		
 		// Draw the frame and recycle it
 		if (lastFrameCopy != null) {
+			//System.out.println("drawing the webcam image...");
 			lblInstruction.getGraphics().drawImage(lastFrameCopy.getBufferedImage(), 0, 0, width, height, null);
 			lastFrameCopy.recycle();
 		}

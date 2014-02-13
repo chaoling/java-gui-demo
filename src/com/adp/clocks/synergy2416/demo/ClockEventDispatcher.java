@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JTextField;
 import javax.swing.Timer;
 
 /**
@@ -62,19 +63,7 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 		diffAndEmit (m_status);
 	}
 	
-	public void initialize() {
-		//simulate initialization process, TBD
-//		int second = 1000; //milliseconds
-//		  ActionListener taskPerformer = new ActionListener() {
-//		      public void actionPerformed(ActionEvent evt) {
-//		    	  System.out.println("Changing clock status to ready done.");
-//		    	  m_status = CLOCK_STATUS.CLOCKSTATUS_READY;
-//		    	  diffAndEmit(m_status);
-//		      }
-//		  };
-//		  Timer t = new Timer(5*second, taskPerformer);
-//		  t.setRepeats(false);
-//		  t.start();	  
+	public void initialize() {	  
 		while (FPU.openFPU("/root/fingers") !=0 ){
 		}
 		System.out.println("Changing clock status to ready ...");
@@ -84,11 +73,7 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 	}
 
 	public void handlekeyPressed(KeyEvent e) {
-		if(e.getKeyChar()==27){
-			System.out.println("need to get focused");
-			m_status = CLOCK_STATUS.CLOCKSTATUS_MENU;
-			diffAndEmit(m_status);
-		}
+		 
 		switch(e.getKeyCode()){
 			case KeyEvent.VK_F1:			
 				m_status = CLOCK_STATUS.CLOCKSTATUS_VIDEO;
@@ -127,12 +112,16 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 				//m_status = CLOCK_STATUS.CLOCKSTATUS_SYSINFO;
 				//diffAndEmit(m_status);
 				//DemoSysInfo.showInfo();
-				break;
 			case KeyEvent.VK_F6:
 				//OUT key sequence starts with F6 (keyCode 117)
 			case KeyEvent.VK_ENTER:
+				break;
 			case KeyEvent.VK_ESCAPE:
-				
+				Component source = e.getComponent();
+		         if (source instanceof JTextField){
+		             JTextField f = (JTextField) source;
+		             f.setText("");
+		         }
 				//Let the focus widow handle the enter/esc/IN/OUT key event
 				break;
 			default:
@@ -147,6 +136,7 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent e) {
 		// TODO Auto-generated method stub
+		//MainWindow.keypadsound.start();
 		System.out.println("Key Char: "+ e.getKeyChar() +" Key Code:  "+ (int) e.getKeyCode());
 		Component comp = e.getComponent();
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().redispatchEvent(comp,e);
