@@ -13,22 +13,17 @@ public class InitializingPane extends JPanel{
 	private static final int LogoSize=50;
 	private  JLabel lblBackground;
 	private JLabel lblInstruction;
-	private MainWindow mw;
-	
-	public MainWindow getMw() {
-		return mw;
-	}
-
-	public void setMw(MainWindow mw) {
-		this.mw = mw;
-	}
+	private MainWindow m_mw;
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	public InitializingPane(MainWindow mw) {
-		setMw(mw);
+		this.m_mw = mw;
 		addComponentsToPane();
+	    m_mw.setContentPane(this);
+	    m_mw.pack();
+		m_mw.setVisible(true);
 	}
 
 	private void addComponentsToPane() {

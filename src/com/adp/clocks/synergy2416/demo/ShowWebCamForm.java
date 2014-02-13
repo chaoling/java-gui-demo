@@ -54,24 +54,24 @@ public class ShowWebCamForm  extends JPanel implements CaptureCallback{
 	private JLabel lblInstruction;
 	private MainWindow m_mw;
 
-	public MainWindow getM_mw() {
-		return m_mw;
-	}
-	public void setM_mw(MainWindow m_mw) {
-		this.m_mw = m_mw;
-	}
 	/**
 	 * Start a new GetSnapshot UI
 	 * @throws V4L4JException if there is a problem capturing from the given device
 	 */
 	public ShowWebCamForm(MainWindow mw){
-		setM_mw(mw);
+		this.m_mw = mw;
 		device = (System.getProperty("test.device") != null) ? System.getProperty("test.device") : "/dev/video0"; 
 		width = (System.getProperty("test.width")!=null) ? Integer.parseInt(System.getProperty("test.width")) : 320;
 		height = (System.getProperty("test.height")!=null) ? Integer.parseInt(System.getProperty("test.height")) : 240;
 		std = (System.getProperty("test.standard")!=null) ? Integer.parseInt(System.getProperty("test.standard")) : V4L4JConstants.STANDARD_WEBCAM;
 		channel = (System.getProperty("test.channel")!=null) ? Integer.parseInt(System.getProperty("test.channel")) : 0;
 		lastVideoFrame = null;
+		
+		 this.setOpaque(true); //content panes must be opaque
+//	     m_mw.getContentPane().removeAll();
+//	     m_mw.getContentPane().add(this);
+//		 ((JPanel)m_mw.getContentPane()).revalidate();
+//		 m_mw.repaint();
 
 		// initialise the video device and frame grabber
 

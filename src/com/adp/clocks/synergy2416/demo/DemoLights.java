@@ -4,28 +4,28 @@ public class DemoLights {
 
 	public static void show() {
 		System.out.println("Flash Lights");
-		DemoFPU.redOn();
+		FPU.Light.RED.on();
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		DemoFPU.greenOn();
+		FPU.Light.GREEN.on();
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		DemoFPU.redOff();
+		FPU.Light.RED.off();
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		DemoFPU.greenOff();
+		FPU.Light.GREEN.off();
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
