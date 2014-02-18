@@ -14,7 +14,6 @@ import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
@@ -145,7 +144,7 @@ public class MainWindow extends JFrame {
             		if (e.toString().contains("JButton")) {
             			System.out.println("JButton:"+e.getSource().toString());
             			//MainWindow.simulateMouseClick((Component) e.getSource());
-            			MainWindow.simulateKeyPadClick(KeyEvent.VK_ESCAPE);	
+            			//MainWindow.simulateKeyPadClick(KeyEvent.VK_ESCAPE);	
             		}
                     System.out.println("AWT:"+e);
                     System.out.flush();
@@ -187,6 +186,5 @@ public static void simulateKeyPadClick(int keycode){
 		try{Thread.sleep(50);}catch(InterruptedException e1){}
 		r.keyRelease(keycode);
 	}
-}
-	
+  }	
 }

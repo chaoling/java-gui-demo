@@ -3,7 +3,6 @@ package com.adp.clocks.synergy2416.demo;
 
 import java.awt.Component;
 import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +46,10 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 		}	
 	}
 	
+	public static CLOCK_STATUS getM_status() {
+		return m_status;
+	}
+
 	private void diffAndEmit(CLOCK_STATUS cs){
 		if (m_prestatus != cs) {
   		    m_prestatus = cs;
@@ -72,7 +75,7 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 	public void handlekeyPressed(KeyEvent e) {
 		
 		//System.out.println("keypad pressed, play click sound.");
-		//MainWindow.getM_ap().playKeypadSound();
+		MainWindow.getM_ap().playKeypadSound();
 		
 		switch(e.getKeyCode()){
 			case KeyEvent.VK_F1:			
@@ -136,9 +139,9 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent e) {
 		
-		System.out.println("Key Char: "+ e.getKeyChar() +" Key Code:  "+ (int) e.getKeyCode());
-		Component comp = e.getComponent();
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().redispatchEvent(comp,e);
+		//System.out.println("Key Char: "+ e.getKeyChar() +" Key Code:  "+ (int) e.getKeyCode());
+		//Component comp = e.getComponent();
+		//KeyboardFocusManager.getCurrentKeyboardFocusManager().redispatchEvent(comp,e);
 	    if (e.getID() == KeyEvent.KEY_PRESSED) {
 	    	handlekeyPressed(e);
             System.out.println("key pressed");

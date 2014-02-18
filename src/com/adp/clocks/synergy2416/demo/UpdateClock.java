@@ -10,7 +10,7 @@ import javax.swing.Timer;
 
 public class UpdateClock {
 	 private static SimpleDateFormat mFormatTime =  new SimpleDateFormat("hh:mm:ss");
-	 private static SimpleDateFormat mFormatDate =  new SimpleDateFormat("yyyy-MM-dd");
+	 private static SimpleDateFormat mFormatDate =  new SimpleDateFormat("EEE MMM dd, yyyy");
 
 	/**
 	 * 

@@ -7,6 +7,8 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
@@ -24,6 +26,8 @@ public class WelcomeForm extends JPanel implements FingerPrintEnrollmentHandler,
 	 * 
 	 */
 	private  JLabel m_lblWelcomeLabel;
+	private JLabel m_lblStatusLabel;
+	private JPanel m_pMsg;
 	private MainWindow m_mw;
 	
 	/**
@@ -74,13 +78,23 @@ public class WelcomeForm extends JPanel implements FingerPrintEnrollmentHandler,
 	}
 	
 	public void updateLabel(){
-		m_mw.getM_ec().getM_lblInstruction().setText("<html><font color='yellow'>Press <font color='red'>F1-F4 </font> key to start demo funtions</font> </html>");
+		m_mw.getM_ec().getM_lblInstruction().setText("<html><font color=black>Press <font color=red>F1-F4 </font> key to start demo funtions</font> </html>");
 		m_lblWelcomeLabel.setText("<html><font color = Yellow><b>Welcome!</b></font></html>");
+		m_lblStatusLabel.setText("");
 	}
 	private void addComponentsToPane() {
 		createWelcomeLabel();
-		add(m_lblWelcomeLabel,BorderLayout.CENTER);
-		m_lblWelcomeLabel.setText("<html><font color = Yellow><b>Welcome!</b></font></html>");
+		createStatusLabel();
+		m_pMsg = new JPanel();
+		m_pMsg.setSize(320, 220);
+		m_pMsg.setLayout(new BoxLayout(m_pMsg, BoxLayout.Y_AXIS));
+		m_pMsg.add(Box.createVerticalStrut(20));
+		m_pMsg.add(m_lblWelcomeLabel);
+		m_pMsg.add(Box.createVerticalStrut(5));
+		m_pMsg.add(m_lblStatusLabel);
+		m_pMsg.setOpaque(false);
+		add(m_pMsg,BorderLayout.CENTER);
+		updateLabel();
 		
 		
 		//UpdateClock.initialize(m_lblTimeLabel);
@@ -92,6 +106,13 @@ public class WelcomeForm extends JPanel implements FingerPrintEnrollmentHandler,
 		m_lblWelcomeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		m_lblWelcomeLabel.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
 		m_lblWelcomeLabel.setOpaque(false);
+	}
+	private void createStatusLabel(){
+		m_lblStatusLabel = new JLabel();
+		m_lblStatusLabel.setFont(new Font("Times", Font.PLAIN, 20));
+		m_lblStatusLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+		m_lblStatusLabel.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
+		m_lblStatusLabel.setOpaque(false);
 	}
 	
 	class IdentifyEmployee extends SwingWorker<String, Object> {
@@ -111,12 +132,12 @@ public class WelcomeForm extends JPanel implements FingerPrintEnrollmentHandler,
                   	
                   	FPU.Light.RED.off();
                   	FPU.Light.GREEN.on();
-                  	m_lblWelcomeLabel.setText("<html><font color=white size=10>"+strResult+"</font></html>");
+                  	m_lblWelcomeLabel.setText("<html><font color=black size=10>"+strResult+"</font></html>");
                   	m_lblWelcomeLabel.requestFocusInWindow();
                   	MainWindow.getM_ap().playEnrollSound();
                   } else {
                   	
-                  	m_lblWelcomeLabel.setText("<html><font color=white size=10>"+strResult+"</font></html>");
+                  	m_lblWelcomeLabel.setText("<html><font color=black size=10>"+strResult+"</font></html>");
                   	FPU.Light.GREEN.off();
                   	FPU.Light.RED.on();
                   	m_lblWelcomeLabel.requestFocusInWindow();
@@ -136,13 +157,13 @@ public class WelcomeForm extends JPanel implements FingerPrintEnrollmentHandler,
 	public void setBadge(String badge) {
 		// TODO Auto-generated method stub
 		System.out.println("Badge Identified: "+badge);
-		m_lblWelcomeLabel.setText("Badge Identified: "+ "<html><font Color=red>"+ badge +"</font></html>");
+		m_lblStatusLabel.setText("<html><font color=black>Badge Identified: </font><font Color=red>"+ badge +"</font></html>");
 		
 	}
 
 	public void setStepCount(int count) {
 		// TODO Auto-generated method stub
-		m_lblWelcomeLabel.setText("\nPlease place finger "+ count + " times");
+		m_lblStatusLabel.setText("\nPlease place finger "+ count + " times");
 		
 	}
 
@@ -152,17 +173,17 @@ public class WelcomeForm extends JPanel implements FingerPrintEnrollmentHandler,
 		case 1:
 			//MainWindow.getM_ap().playPlaceFingerSound();
 			System.out.println("Please place finger Step: "+ step + " Error: " + repeatOnReaderError);
-			m_lblWelcomeLabel.setText("\nPlease place finger Step: "+ step);
+			m_lblStatusLabel.setText("\nPlease place finger Step: "+ step);
 			break;
 		case 2:
 			//MainWindow.getM_ap().playplaceFingerAgainSound();
 			System.out.println("Please place finger Step: "+ step + " Error: " + repeatOnReaderError);
-			m_lblWelcomeLabel.setText("\nPlease place finger Step: "+ step );
+			m_lblStatusLabel.setText("\nPlease place finger Step: "+ step );
 			break;
 		case 3:
 			//MainWindow.getM_ap().playplaceFingerAgainSound();
 			System.out.println("Please place finger Step: "+ step + " Error: " + repeatOnReaderError);
-			m_lblWelcomeLabel.setText("\nPlease place finger Step: "+ step );
+			m_lblStatusLabel.setText("\nPlease place finger Step: "+ step );
 			break;
 		}
 		
@@ -172,7 +193,7 @@ public class WelcomeForm extends JPanel implements FingerPrintEnrollmentHandler,
 		// TODO Auto-generated method stub
 		MainWindow.getM_ap().playSuccessSound();
 		System.out.println("Please Remove Finger Step: "+ step + "  ");
-		m_lblWelcomeLabel.setText("\nPlease Remove finger Step: "+ step + " ");
+		m_lblStatusLabel.setText("\nPlease Remove finger Step: "+ step + " ");
 		
 	}
 

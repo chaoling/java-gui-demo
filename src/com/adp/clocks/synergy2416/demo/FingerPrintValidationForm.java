@@ -65,7 +65,7 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
             try { 
             	String strResult = get();
                 m_lblStatus.setText("Employee ID: "+m_strBadgeNum+" Finger: "+m_nFingerNum);
-                m_txtResult.setText("<html><font color=white>"+strResult+"<br> Press Enter to Restart "+"<br> Press MENU to the main menu</font><html>");
+                m_txtResult.setText("<html><font color=black>"+strResult+"<br> Press Enter to Restart "+"<br> Press MENU to the main menu</font><html>");
                 
                 if (strResult.compareTo("Succeed!") == 0) {
                 	FPU.Light.RED.off();
@@ -94,13 +94,13 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
             	String strResult = get();
                 m_lblStatus.setText("Employee ID: "+m_strBadgeNum+" Finger: "+m_nFingerNum);
                 if (strResult.compareTo("Succeed!") == 0) {
-                	 m_txtResult.setText("<html><font color=white>Press Finger on The FP reader to Verify </font><html>");
+                	 m_txtResult.setText("<html><font color=black>Press Finger on The FP reader to Verify </font><html>");
                 	FPU.Light.RED.off();
                 	FPU.Light.GREEN.on();
                 	(new FingerPrintValidation()).execute(); //only run the validation thread when there is valid badge number.
                 	//MainWindow.enrollsound.start();
                 } else {
-                	m_txtResult.setText("<html><font color=white>"+strResult+"<br> Press Enter to Restart "+"<br> Press MENU to the main menu</font><html>");
+                	m_txtResult.setText("<html><font color=black>"+strResult+"<br> Press Enter to Restart "+"<br> Press MENU to the main menu</font><html>");
                 	FPU.Light.GREEN.off();
                 	FPU.Light.RED.on();
                 	//MainWindow.beepsound.start();
@@ -159,7 +159,7 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
     
     public void updateLabel()
     {
-    	m_mw.getM_ec().getM_lblInstruction().setText("<html><font color='yellow'>Finger Print Verification</font> </html>");
+    	m_mw.getM_ec().getM_lblInstruction().setText("<html><font color=black>Finger Print Verification</font> </html>");
     }
 
 	public void addComponentToPane() {

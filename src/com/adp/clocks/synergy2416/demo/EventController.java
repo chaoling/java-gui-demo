@@ -38,14 +38,15 @@ public class EventController implements ClockStatusListener {
 	private JPanel m_cardPanel;
 	private WelcomeForm m_welcomeForm;
 	private FingerPrintEnrollForm m_fingerPrintEnrollForm;
-	private FingerPrintValidationForm m_fingerPrintDemoForm;
-	private PlayVideoForm m_videoDemoForm;
+	private FingerPrintValidationForm m_fingerPrintValidationForm;
+	private VideoForm m_videoDemoForm;
 	private ShowWebCamForm m_webCamDemoForm;
 	private JLabel m_lblBackground;
-	private JLabel m_lblInstruction;
+	private JLabel m_lblFormName;
 	private JPanel m_pMenuBar;
 	private JPanel m_pStatusBar;
 	private JPanel m_pFooter;
+	private JPanel m_pHeader;
 	private ImageIcon m_iconBackground;
 	private static final int IconSize=35;
 	private static final int LogoSize=35;
@@ -55,7 +56,7 @@ public class EventController implements ClockStatusListener {
 	}
 	
 	public JLabel getM_lblInstruction() {
-		return m_lblInstruction;
+		return m_lblFormName;
 	}
 	
 	public JPanel getM_pMenuBar() {
@@ -89,22 +90,27 @@ public class EventController implements ClockStatusListener {
 			m_cardPanel.setLayout(m_cards);
 			m_cardPanel.setSize(320, 200);
 			m_cardPanel.setOpaque(false);
+			
 			m_welcomeForm = new WelcomeForm(m_frame);
-			m_fingerPrintEnrollForm = new FingerPrintEnrollForm(m_frame);
-			m_fingerPrintDemoForm = new FingerPrintValidationForm(m_frame);
-			m_videoDemoForm = new PlayVideoForm(m_frame);
+			m_videoDemoForm = new VideoForm(m_frame);
 			m_webCamDemoForm = new ShowWebCamForm(m_frame);
+			m_fingerPrintEnrollForm = new FingerPrintEnrollForm(m_frame);
+			m_fingerPrintValidationForm = new FingerPrintValidationForm(m_frame);
+			
 			m_cardPanel.add(m_welcomeForm,"welcome");
 			m_cardPanel.add(m_videoDemoForm,"videoDemo");
 			m_cardPanel.add(m_webCamDemoForm,"webcamDemo");
 			m_cardPanel.add(m_fingerPrintEnrollForm,"fpEnroll");
-			m_cardPanel.add(m_fingerPrintDemoForm,"fpDemo");
-			m_frame.getContentPane().add(m_lblInstruction,BorderLayout.NORTH);
+			m_cardPanel.add(m_fingerPrintValidationForm,"fpDemo");
+			
+			m_frame.getContentPane().add(m_pHeader,BorderLayout.NORTH);
 			m_frame.getContentPane().add(m_cardPanel,BorderLayout.CENTER);
 			m_frame.getContentPane().add(m_pFooter,BorderLayout.SOUTH);
+			
 			m_frame.pack();
 			m_frame.toFront();
 			m_frame.setVisible(true);
+			
 			System.out.println("Done initializing gui...");
 			MainWindow.getM_ap().playSuccessSound();
 	}
@@ -148,7 +154,7 @@ public class EventController implements ClockStatusListener {
 			lblFpuimage.setIcon(icon);
 			m_pMenuBar.add(lblFpuimage, gbc_lblFpuimage);
 			
-			icon = new ImageIcon(new ImageIcon(getClass().getResource(ResPath+"id-75.png")).getImage().getScaledInstance(IconSize, IconSize, java.awt.Image.SCALE_SMOOTH)); 
+			icon = new ImageIcon(new ImageIcon(getClass().getResource(ResPath+"lock.png")).getImage().getScaledInstance(IconSize, IconSize, java.awt.Image.SCALE_SMOOTH)); 
 			JLabel lblFpuimage_1 = new JLabel();
 			GridBagConstraints gbc_lblFpuimage_1 = new GridBagConstraints();
 			lblFpuimage_1.setIcon(icon);
@@ -170,10 +176,16 @@ public class EventController implements ClockStatusListener {
 	}
 	
 	private void createHeader() {
-			m_lblInstruction = new JLabel("");
+		
+			m_lblFormName = new JLabel();
 			//m_lblInstruction.setIcon(new ImageIcon(new ImageIcon(MainWindow.class.getResource(ResPath+"synel.png")).getImage().getScaledInstance(LogoSize, LogoSize, java.awt.Image.SCALE_SMOOTH)));
-			m_lblInstruction.setIcon(new ImageIcon(new ImageIcon(MainWindow.class.getResource(ResPath+"synel.png")).getImage().getScaledInstance(3*LogoSize, LogoSize, java.awt.Image.SCALE_SMOOTH)));
-			m_lblInstruction.setAlignmentY(Component.TOP_ALIGNMENT);
+			m_lblFormName.setIcon(new ImageIcon(new ImageIcon(MainWindow.class.getResource(ResPath+"SynelLogoTransParent.png")).getImage().getScaledInstance(3*LogoSize, LogoSize, java.awt.Image.SCALE_SMOOTH)));
+			m_lblFormName.setAlignmentY(Component.TOP_ALIGNMENT);
+			
+			m_pHeader = new JPanel();
+			m_pHeader.setSize(320, 20);
+			m_pHeader.setLayout(new BoxLayout(m_pHeader, BoxLayout.X_AXIS));
+	        m_pHeader.add(m_lblFormName);
 		}
 
 	private void createBackgroundLabel(){
@@ -214,12 +226,6 @@ public class EventController implements ClockStatusListener {
 	    m_webCamDemoForm.requestFocusInWindow();
 	}
 	
-	public void loadLEDDemoForm()
-	{
-	    System.out.println("LED Demo ...");
-	    //new ShowWebCamForm(m_frame);
-	}
-	
 	public void loadFingerPrintEnrollForm()
 	{
 	    System.out.println("Loading FingerPrint Enrollment Form");
@@ -235,10 +241,10 @@ public class EventController implements ClockStatusListener {
 	    System.out.println("Loading FingerPrint Validation Form");
 	    //new FingerPrintDemoForm(m_frame);
 	    m_cards.show(m_cardPanel, "fpDemo");
-	    m_fingerPrintDemoForm.updateLabel();
-	    m_fingerPrintDemoForm.setFocusable(true);
-	    m_fingerPrintDemoForm.requestFocusInWindow();
-	    m_fingerPrintDemoForm.goDemo();
+	    m_fingerPrintValidationForm.updateLabel();
+	    m_fingerPrintValidationForm.setFocusable(true);
+	    m_fingerPrintValidationForm.requestFocusInWindow();
+	    m_fingerPrintValidationForm.goDemo();
 	}
 	public void loadSysInforForm()
 	{
@@ -263,8 +269,6 @@ public class EventController implements ClockStatusListener {
 			break;	
 		case CLOCKSTATUS_VIDEO:
 			System.out.println("LoadPlayVideoForm");
-//			DemoVideo.showVideo();
-//			System.out.println("currentFocusOwner is:" + this.getCurrentFocusedWindow().toString());
 			loadPlayVideoForm();
 			break;
 		case CLOCKSTATUS_WEBCAM:
