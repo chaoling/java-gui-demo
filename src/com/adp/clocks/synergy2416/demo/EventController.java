@@ -6,12 +6,6 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.Window;
-import java.awt.image.MemoryImageSource;
-import java.awt.peer.KeyboardFocusManagerPeer;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -33,7 +27,9 @@ import com.adp.clocks.synergy2416.demo.ClockEventDispatcher.CLOCK_STATUS;
  * @author chaol
  *
  */
-public class EventController implements KeyboardFocusManagerPeer, ClockStatusListener {
+public class EventController implements ClockStatusListener {
+	
+	private static final String ResPath = "/com/adp/clocks/synergy2416/res/";
 	
 	private MainWindow m_frame;
 	private CLOCK_STATUS m_curStatus = CLOCK_STATUS.CLOCKSTATUS_UNINITIALIZED;
@@ -41,9 +37,10 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 	private CardLayout m_cards;
 	private JPanel m_cardPanel;
 	private WelcomeForm m_welcomeForm;
-	private FingerPrintEnrollForm m_fingerPrintDemoForm;
-	private PlayVideoForm m_videoDemoPanel;
-	private ShowWebCamForm m_webCamDemoPanel;
+	private FingerPrintEnrollForm m_fingerPrintEnrollForm;
+	private FingerPrintValidationForm m_fingerPrintDemoForm;
+	private PlayVideoForm m_videoDemoForm;
+	private ShowWebCamForm m_webCamDemoForm;
 	private JLabel m_lblBackground;
 	private JLabel m_lblInstruction;
 	private JPanel m_pMenuBar;
@@ -56,28 +53,13 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 	public EventController(MainWindow mw) {
 		this.m_frame = mw;
 	}
-	@Override
-	public void clearGlobalFocusOwner(Window arg0) {
-		// TODO Auto-generated method stub
-		
+	
+	public JLabel getM_lblInstruction() {
+		return m_lblInstruction;
 	}
-
-	@Override
-	public Component getCurrentFocusOwner() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Window getCurrentFocusedWindow() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setCurrentFocusOwner(Component arg0) {
-		// TODO Auto-generated method stub
-		
+	
+	public JPanel getM_pMenuBar() {
+		return m_pMenuBar;
 	}
 	
 	public void initialize()
@@ -96,8 +78,6 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 			m_frame.setBounds(0, 0, 320, 240);
 			m_frame.setSize(320,240);
 			m_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			m_frame.getToolkit().beep();
-			hideCursor();
 			createBackgroundLabel();
 			createHeader();
 			createFooter();
@@ -109,13 +89,15 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 			m_cardPanel.setLayout(m_cards);
 			m_cardPanel.setSize(320, 200);
 			m_cardPanel.setOpaque(false);
-			m_welcomeForm = new WelcomeForm();
-			m_fingerPrintDemoForm = new FingerPrintEnrollForm();
-			m_videoDemoPanel = new PlayVideoForm();
-			m_webCamDemoPanel = new ShowWebCamForm();
+			m_welcomeForm = new WelcomeForm(m_frame);
+			m_fingerPrintEnrollForm = new FingerPrintEnrollForm(m_frame);
+			m_fingerPrintDemoForm = new FingerPrintValidationForm(m_frame);
+			m_videoDemoForm = new PlayVideoForm(m_frame);
+			m_webCamDemoForm = new ShowWebCamForm(m_frame);
 			m_cardPanel.add(m_welcomeForm,"welcome");
-			m_cardPanel.add(m_videoDemoPanel,"videoDemo");
-			m_cardPanel.add(m_webCamDemoPanel,"webcamDemo");
+			m_cardPanel.add(m_videoDemoForm,"videoDemo");
+			m_cardPanel.add(m_webCamDemoForm,"webcamDemo");
+			m_cardPanel.add(m_fingerPrintEnrollForm,"fpEnroll");
 			m_cardPanel.add(m_fingerPrintDemoForm,"fpDemo");
 			m_frame.getContentPane().add(m_lblInstruction,BorderLayout.NORTH);
 			m_frame.getContentPane().add(m_cardPanel,BorderLayout.CENTER);
@@ -124,17 +106,9 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 			m_frame.toFront();
 			m_frame.setVisible(true);
 			System.out.println("Done initializing gui...");
-			MainWindow.successbuzzersound.start();
+			MainWindow.getM_ap().playSuccessSound();
 	}
 	
-	private void hideCursor() {
-		// TODO Auto-generated method stub
-		int[] pixels = new int[16 * 16];
-		Image image = Toolkit.getDefaultToolkit().createImage(
-		        new MemoryImageSource(16, 16, pixels, 0, 16));
-		Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0, 0), "invisibleCursor");
-		
-	}
 	private void createFooter() {
 		    m_pStatusBar = new JPanel();
 		    JLabel lblTimeLabel = new JLabel();
@@ -150,13 +124,13 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 			m_pMenuBar.setBorder(new EmptyBorder(0, 0, 0, 0));
 			m_pMenuBar.setLayout(new GridLayout(1, 6));
 		
-			ImageIcon icon = new ImageIcon(new ImageIcon(getClass().getResource("/com/adp/clocks/synergy2416/res/video-75.png")).getImage().getScaledInstance(IconSize, IconSize, java.awt.Image.SCALE_SMOOTH)); 
+			ImageIcon icon = new ImageIcon(new ImageIcon(getClass().getResource(ResPath+"video-75.png")).getImage().getScaledInstance(IconSize, IconSize, java.awt.Image.SCALE_SMOOTH)); 
 			JLabel lblVideoimage = new JLabel();
 			GridBagConstraints gbc_lblVideoimage = new GridBagConstraints();
 			lblVideoimage.setIcon(icon);
 			m_pMenuBar.add(lblVideoimage, gbc_lblVideoimage);
 			
-			icon = new ImageIcon(new ImageIcon(getClass().getResource("/com/adp/clocks/synergy2416/res/camera-75.png")).getImage().getScaledInstance(IconSize, IconSize, java.awt.Image.SCALE_SMOOTH)); 
+			icon = new ImageIcon(new ImageIcon(getClass().getResource(ResPath+"camera-75.png")).getImage().getScaledInstance(IconSize, IconSize, java.awt.Image.SCALE_SMOOTH)); 
 			JLabel lblCameraimage = new JLabel();
 			GridBagConstraints gbc_lblCameraimage = new GridBagConstraints();
 			lblCameraimage.setIcon(icon);
@@ -168,13 +142,13 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 //			lblGpiolabel.setIcon(icon);
 //			m_pMenuBar.add(lblGpiolabel, gbc_lblGpiolabel);
 			
-			icon = new ImageIcon(new ImageIcon(getClass().getResource("/com/adp/clocks/synergy2416/res/finger-icon-75.png")).getImage().getScaledInstance(IconSize, IconSize, java.awt.Image.SCALE_SMOOTH)); 
+			icon = new ImageIcon(new ImageIcon(getClass().getResource(ResPath+"finger-icon-75.png")).getImage().getScaledInstance(IconSize, IconSize, java.awt.Image.SCALE_SMOOTH)); 
 			JLabel lblFpuimage = new JLabel();
 			GridBagConstraints gbc_lblFpuimage = new GridBagConstraints();
 			lblFpuimage.setIcon(icon);
 			m_pMenuBar.add(lblFpuimage, gbc_lblFpuimage);
 			
-			icon = new ImageIcon(new ImageIcon(getClass().getResource("/com/adp/clocks/synergy2416/res/id-75.png")).getImage().getScaledInstance(IconSize, IconSize, java.awt.Image.SCALE_SMOOTH)); 
+			icon = new ImageIcon(new ImageIcon(getClass().getResource(ResPath+"id-75.png")).getImage().getScaledInstance(IconSize, IconSize, java.awt.Image.SCALE_SMOOTH)); 
 			JLabel lblFpuimage_1 = new JLabel();
 			GridBagConstraints gbc_lblFpuimage_1 = new GridBagConstraints();
 			lblFpuimage_1.setIcon(icon);
@@ -196,13 +170,14 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 	}
 	
 	private void createHeader() {
-			m_lblInstruction = new JLabel("<html><font color='yellow'>Press <font color='red'>F1-F4 </font> key to start demo funtions.</font> </html>");
-			m_lblInstruction.setIcon(new ImageIcon(new ImageIcon(MainWindow.class.getResource("/com/adp/clocks/synergy2416/res/synel.png")).getImage().getScaledInstance(LogoSize, LogoSize, java.awt.Image.SCALE_SMOOTH)));
+			m_lblInstruction = new JLabel("");
+			//m_lblInstruction.setIcon(new ImageIcon(new ImageIcon(MainWindow.class.getResource(ResPath+"synel.png")).getImage().getScaledInstance(LogoSize, LogoSize, java.awt.Image.SCALE_SMOOTH)));
+			m_lblInstruction.setIcon(new ImageIcon(new ImageIcon(MainWindow.class.getResource(ResPath+"synel.png")).getImage().getScaledInstance(3*LogoSize, LogoSize, java.awt.Image.SCALE_SMOOTH)));
 			m_lblInstruction.setAlignmentY(Component.TOP_ALIGNMENT);
 		}
 
 	private void createBackgroundLabel(){
-		m_iconBackground = new ImageIcon(MainWindow.class.getResource("/com/adp/clocks/synergy2416/res/Background.png"));
+		m_iconBackground = new ImageIcon(MainWindow.class.getResource(ResPath+"Background.png"));
 		m_lblBackground = new JLabel(m_iconBackground);
 		m_lblBackground.setOpaque(true);
 	}
@@ -215,22 +190,28 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 	public void loadWelcomeForm()
 	{
 	    System.out.println("Loading WelcomeForm");
+	    FPU.Light.RED.off();
+    	FPU.Light.GREEN.off();
 	    m_cards.show(m_cardPanel, "welcome");
+	    m_welcomeForm.updateLabel();
 	    m_welcomeForm.requestFocusInWindow();
+	    m_welcomeForm.IdentifyEmp();
 	}
 	
 	public void loadPlayVideoForm()
 	{
 	    System.out.println("Loading Playing Video Form");
 	    m_cards.show(m_cardPanel, "videoDemo");
-	    m_videoDemoPanel.requestFocusInWindow();
+	    m_videoDemoForm.updateLabel();
+	    m_videoDemoForm.requestFocusInWindow();
 	}
 	
 	public void loadShowWebCamForm()
 	{
 	    System.out.println("Loading WebCamForm");
 	    m_cards.show(m_cardPanel, "webcamDemo");
-	    m_webCamDemoPanel.requestFocusInWindow();
+	    m_webCamDemoForm.updateLabel();
+	    m_webCamDemoForm.requestFocusInWindow();
 	}
 	
 	public void loadLEDDemoForm()
@@ -239,19 +220,25 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 	    //new ShowWebCamForm(m_frame);
 	}
 	
-	public void loadFingerPrintDemoForm()
+	public void loadFingerPrintEnrollForm()
 	{
-	    System.out.println("Loading FingerPrint Demo Form");
-	    m_cards.show(m_cardPanel, "fpDemo");
-	    m_fingerPrintDemoForm.setFocusable(true);
-	    m_fingerPrintDemoForm.requestFocusInWindow();
-	    m_fingerPrintDemoForm.goDemo();
+	    System.out.println("Loading FingerPrint Enrollment Form");
+	    m_cards.show(m_cardPanel, "fpEnroll");
+	    m_fingerPrintEnrollForm.updateLabel();
+	    m_fingerPrintEnrollForm.setFocusable(true);
+	    m_fingerPrintEnrollForm.requestFocusInWindow();
+	    m_fingerPrintEnrollForm.goDemo();
 	    
 	}
-	public void loadFingerPrintValidationForm()
+	public void loadFingerPrintDemoForm()
 	{
 	    System.out.println("Loading FingerPrint Validation Form");
 	    //new FingerPrintDemoForm(m_frame);
+	    m_cards.show(m_cardPanel, "fpDemo");
+	    m_fingerPrintDemoForm.updateLabel();
+	    m_fingerPrintDemoForm.setFocusable(true);
+	    m_fingerPrintDemoForm.requestFocusInWindow();
+	    m_fingerPrintDemoForm.goDemo();
 	}
 	public void loadSysInforForm()
 	{
@@ -285,12 +272,12 @@ public class EventController implements KeyboardFocusManagerPeer, ClockStatusLis
 			loadShowWebCamForm();
 			break;
 		case CLOCKSTATUS_FINGERPRINT_ENROLL:
+			System.out.println("LoadFingerPrintEnrollForm");
+			loadFingerPrintEnrollForm();
+			break;
+		case CLOCKSTATUS_FINGERPRINT_DEMO:
 			System.out.println("LoadFingerPrintDemoForm");
 			loadFingerPrintDemoForm();
-			break;
-		case CLOCKSTATUS_FINGERPRINT_VALIDATE:
-			System.out.println("LoadFingerPrintValidationForm");
-			loadFingerPrintValidationForm();
 			break;
 		case CLOCKSTATUS_SYSINFO:
 			System.out.println("LoadSysInforForm");

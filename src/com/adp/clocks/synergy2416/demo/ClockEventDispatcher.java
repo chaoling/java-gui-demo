@@ -4,14 +4,11 @@ package com.adp.clocks.synergy2416.demo;
 import java.awt.Component;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JTextField;
-import javax.swing.Timer;
 
 /**
  * @author chaol
@@ -30,7 +27,7 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 	    CLOCKSTATUS_WEBCAM,
 	    CLOCKSTATUS_LED,
 	    CLOCKSTATUS_FINGERPRINT_ENROLL,
-	    CLOCKSTATUS_FINGERPRINT_VALIDATE,
+	    CLOCKSTATUS_FINGERPRINT_DEMO,
 	    CLOCKSTATUS_SYSINFO,
 	    CLOCKSTATUS_MENU,
 	    CLOCKSTATUS_READY
@@ -64,7 +61,7 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 	}
 	
 	public void initialize() {	  
-		while (FPU.openFPU("/root/fingers") !=0 ){
+		while (FPU.openFPU("/root/fingers/") !=0 ){
 		}
 		System.out.println("Changing clock status to ready ...");
   	  	m_status = CLOCK_STATUS.CLOCKSTATUS_READY;
@@ -73,7 +70,10 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 	}
 
 	public void handlekeyPressed(KeyEvent e) {
-		 
+		
+		//System.out.println("keypad pressed, play click sound.");
+		//MainWindow.getM_ap().playKeypadSound();
+		
 		switch(e.getKeyCode()){
 			case KeyEvent.VK_F1:			
 				m_status = CLOCK_STATUS.CLOCKSTATUS_VIDEO;
@@ -94,7 +94,7 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 				
 			case KeyEvent.VK_F4:
 				
-				m_status = CLOCK_STATUS.CLOCKSTATUS_FINGERPRINT_VALIDATE;
+				m_status = CLOCK_STATUS.CLOCKSTATUS_FINGERPRINT_DEMO;
 				diffAndEmit(m_status);
 				//DemoFPU.Verify();
 				break;
@@ -122,7 +122,7 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 		             JTextField f = (JTextField) source;
 		             f.setText("");
 		         }
-				//Let the focus widow handle the enter/esc/IN/OUT key event
+				//Let the focus window handle the enter/esc/IN/OUT key event
 				break;
 			default:
 				break;
@@ -135,8 +135,7 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent e) {
-		// TODO Auto-generated method stub
-		//MainWindow.keypadsound.start();
+		
 		System.out.println("Key Char: "+ e.getKeyChar() +" Key Code:  "+ (int) e.getKeyCode());
 		Component comp = e.getComponent();
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().redispatchEvent(comp,e);

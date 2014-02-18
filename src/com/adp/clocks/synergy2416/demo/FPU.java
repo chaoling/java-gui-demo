@@ -2,7 +2,7 @@ package com.adp.clocks.synergy2416.demo;
 
 public final class FPU {  //implements FingerPrintEnrollmentHandler, Employee{
 
-	//static DemoDialog badge = new DemoDialog("Please Place Finger");
+
 	static { System.loadLibrary("synergy2416"); }
 	private static class FPULoader {
         private static final FPU INSTANCE = new FPU();
@@ -137,7 +137,7 @@ public final class FPU {  //implements FingerPrintEnrollmentHandler, Employee{
 		case 0:
 			return "Succeed!";
 		case -100:
-			return "The data supplied to the function. Badge Number, finger number or Template format is incorrect. The template was not enrolled and not saved to a file.";
+			return "The data supplied to the function, Badge Number, finger number or Template format is incorrect. The template was not enrolled and not saved to a file.";
 		case -101:
 			return "No Templates in FPU Reader";
 		case -102:
@@ -149,11 +149,11 @@ public final class FPU {  //implements FingerPrintEnrollmentHandler, Employee{
 		case -105:
 			return "Finger did not match - The supplied finger did not match any template in the finger print sensor";
 		case -106:
-			return "The finger you are trying to Enroll already exists in the finger print reader under a different badge. You must first delete this finger under the corresponding badge if you wish to enroll this finger under a new badge. You cannot have one finger associated with 2 different badges.";
+			return "The finger you are trying to Enroll already exists in the finger print reader under a different badge."; // You must first delete this finger under the corresponding badge if you wish to enroll this finger under a new badge. You cannot have one finger associated with 2 different badges.";
 		case -107:
 			return "Bad Finger Read or No finger Present";
 		case -108:
-			return "There are too many templates in the finger print reader to begin enrollment. Each finger print reader can only support a certain number of templates. Usually 3,000 or 10,000. Consult with the manufacturer if this problem arises and you believe you are under the proper threshold.";
+			return "There are too many templates in the finger print reader to begin enrollment.";// Each finger print reader can only support a certain number of templates. Usually 3,000 or 10,000. Consult with the manufacturer if this problem arises and you believe you are under the proper threshold.";
 		case -109:
 			return "Bad Badge, The badge you entered is not supported";
 		case -110:
@@ -242,104 +242,4 @@ public final class FPU {  //implements FingerPrintEnrollmentHandler, Employee{
 	  }
 	  return app_msgConvert(nRet);
   }
-		  
-//	public static void Enroll() {
-//			
-//		System.out.println("FPU Enroll");
-//		//DemoInput badge=new DemoInput();
-//		
-//		   String badgeID = DemoInput.getBadgeID();
-//		   System.out.println("BadgeID: "+ badgeID);
-//		   System.out.println("Enroll Count: "+FPU.FP_GET_ENROLECOUNT());
-//		   System.out.println("Enroll Status: "+FPU.FP_ENROLE_EMPLOYEE(badgeID, 1, (long)15000,(long)1000, fpu));
-//		   System.out.println("Enroll Count: "+FPU.FP_GET_ENROLECOUNT());
-//		   //DemoEvent.badge4.setVisible(true);	
-//		   //badge =null;	 	
-//	}
-//
-//	public static void Verify() {
-//		//DemoEvent.badge.setgVisible(true);
-//		
-//		SwingUtilities.invokeLater(new Runnable() {
-//			@Override
-//			public void run() {
-//				//DemoEvent.badge.setgVisible(true);
-//				int id = -107;
-//				while(id==-107 || id==-100){
-//					id = FPU.FP_IDENTIFY_EMPLOYEE();
-//					System.out.println("Enroll Status: "+ id);
-//				}
-//				//DemoEvent.badge.setVisible(false);
-//				//DemoEvent.badge4.setVisibleTime(true);
-//			}
-//		});
-//		
-//		
-//	}
-
-//	@Override
-//	public void onReadyForFinger(int step, boolean repeatOnReaderError) {
-//		System.out.println("Please Place Finger Step: "+ step);
-//		switch(step){
-//			case 1:
-//				//DemoEvent.badge.setVisible2(true);			
-//			break;
-//			case 2:
-//				//DemoEvent.badge2.setVisible2(true);		
-//			break;
-//			case 3:
-//				//DemoEvent.badge3.setVisible2(true);
-//			default:
-//				//fall through
-//			break;
-//		}
-//		//DemoDialog badge4 = new DemoDialog("Success!");
-//		/*
-//		switch(step){
-//		case 1:
-//		System.out.println("Please place finger Step: "+ step+ "Error: " + repeatOnReaderError);
-//		break;
-//		case 2:
-//		System.out.println("Please place finger Step: "+ step+ "Error: " + repeatOnReaderError);
-//		break;
-//		case 3:
-//		System.out.println("Please place finger Step: "+ step+ "Error: " + repeatOnReaderError);
-//		break;
-//	}
-//	*/
-//		
-//		
-//	}
-//	@Override
-//	public void onFingerPrintRead(int step) {
-//		System.out.println("Please Remove Finger Step: "+ step);
-//		switch(step){
-//		case 1:
-//			//DemoEvent.badge.setVisible(false);			
-//		break;
-//		case 2:
-//			//DemoEvent.badge2.setVisible(false);		
-//		break;
-//		case 3:
-//			//DemoEvent.badge3.setVisible(false);
-//		default:
-//			//fall through
-//		
-//		break;
-//	}
-//		
-//	}
-//	@Override
-//	public void setBadge(String badge) {
-//		System.out.println("Badge Identified: "+badge);
-//	}
-//	@Override
-//	public void setStepCount(int count) {
-//		// TODO Auto-generated method stub
-//		System.out.println("Start");
-//		System.out.println("Please place finger "+ count + " times");
-//		
-//	}
-//	
-//
 }

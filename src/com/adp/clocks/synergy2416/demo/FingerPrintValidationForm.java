@@ -24,65 +24,94 @@ import javax.swing.SwingWorker;
 
 import com.adp.clocks.synergy2416.demo.ClockEventDispatcher.CLOCK_STATUS;
 
-public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollmentHandler, Employee {
+public class FingerPrintValidationForm extends JPanel implements Employee {
 	
     /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	final static String PANEL_ID = "Input_Badge_ID";
-    final static String PANEL_FPN = "Input_FingerPrint_Number";
-    final static String PANEL_STATUS = "Enrollment_Status";
+	final static String DEMO_ID = "Demo_Badge_ID";
+    final static String DEMO_FPN = "Demo_FingerPrint_Number";
+    final static String DEMO_STATUS = "Demo_Status";
     
 	private JTextField m_txtBadgeNum;
 	private JLabel m_lblInputBadgeNum;
 	private JLabel m_lblInputFingerNum;
 	private JTextField m_txtFingerNum;
-	private JLabel m_lblEnrollmentStatus;
+	private JLabel m_lblStatus;
     private String m_strBadgeNum;
     private int m_nFingerNum;
     private CardLayout m_cl;
     private String m_strCurrentCardName;
-	private JTextPane m_txtEnrollmentResult;
+	private JTextPane m_txtResult;
 	private final int m_width=320;
-	private final int m_height = 240;
+	private final int m_height=240;
 	private MainWindow m_mw;
-    
-    public enum CardNames {
-    	Input_Badge_ID,
-    	Input_FingerPrint_Number,
-    	Enrollment_Status
+	
+	public enum CardNames {
+    	Demo_Badge_ID,
+    	Demo_FingerPrint_Number,
+    	Demo_Status
     }
     
-    class FingerPrintEnroll extends SwingWorker<String, Object> {
+    class FingerPrintValidation extends SwingWorker<String, Object> {
         @Override
         public String doInBackground() {
-            return FPU.enroll(m_strBadgeNum, m_nFingerNum,FingerPrintEnrollForm.this);
+            return FPU.validateEmployee(m_strBadgeNum, m_nFingerNum);
         }
 
         @Override
         protected void done() {
             try { 
             	String strResult = get();
-                m_txtEnrollmentResult.setText("<html><font color=white>"+strResult+"<br>Press Enter to Restart "+"<br>Press MENU to the main menu</font><html>");
-                m_lblEnrollmentStatus.setText("Enroll Employee ID: "+m_strBadgeNum+" Finger: "+m_nFingerNum);
+                m_lblStatus.setText("Employee ID: "+m_strBadgeNum+" Finger: "+m_nFingerNum);
+                m_txtResult.setText("<html><font color=white>"+strResult+"<br> Press Enter to Restart "+"<br> Press MENU to the main menu</font><html>");
+                
                 if (strResult.compareTo("Succeed!") == 0) {
-                	
                 	FPU.Light.RED.off();
                 	FPU.Light.GREEN.on();
-                	MainWindow.getM_ap().playSuccessSound();
+                	//MainWindow.enrollsound.start();
                 } else {
-                	
                 	FPU.Light.GREEN.off();
                 	FPU.Light.RED.on();
-                	MainWindow.getM_ap().playBeepSound();
+                	//MainWindow.beepsound.start();
                 }
             } catch (Exception ignore) {
+            	
             }
         }
     }
     
-    public FingerPrintEnrollForm(MainWindow mw) {
+    class FingerPrintBadgeStatus extends SwingWorker<String, Object> {
+        @Override
+        public String doInBackground() {
+            return FPU.badgeStatus(m_strBadgeNum, m_nFingerNum);
+        }
+
+        @Override
+        protected void done() {
+            try { 
+            	String strResult = get();
+                m_lblStatus.setText("Employee ID: "+m_strBadgeNum+" Finger: "+m_nFingerNum);
+                if (strResult.compareTo("Succeed!") == 0) {
+                	 m_txtResult.setText("<html><font color=white>Press Finger on The FP reader to Verify </font><html>");
+                	FPU.Light.RED.off();
+                	FPU.Light.GREEN.on();
+                	(new FingerPrintValidation()).execute(); //only run the validation thread when there is valid badge number.
+                	//MainWindow.enrollsound.start();
+                } else {
+                	m_txtResult.setText("<html><font color=white>"+strResult+"<br> Press Enter to Restart "+"<br> Press MENU to the main menu</font><html>");
+                	FPU.Light.GREEN.off();
+                	FPU.Light.RED.on();
+                	//MainWindow.beepsound.start();
+                }
+            } catch (Exception ignore) {
+            	
+            }
+        }
+    }
+    
+    public FingerPrintValidationForm(MainWindow mw) {
     	this.m_mw = mw;
     	//m_bContinue = true;
     	setSize(m_width, m_height);
@@ -99,11 +128,10 @@ public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollme
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				//MainWindow.getM_ap().playBeepSound();
-				//System.out.println("Pressed"+" " +e.getKeyCode());
+				System.out.println("Pressed"+" " +e.getKeyCode());
 				
 				if( KeyEvent.VK_F7 == e.getKeyCode()){
-					FingerPrintEnrollForm.this.clearForm();
+					FingerPrintValidationForm.this.clearForm();
 			        m_mw.getM_cel().emit(CLOCK_STATUS.CLOCKSTATUS_MENU);
 			        
 				}
@@ -122,23 +150,25 @@ public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollme
 	              System.out.println(this.toString()+"Focus GAINED:"+e);
 	          }
 	          public void focusLost(FocusEvent e){
-	        	  FingerPrintEnrollForm.this.clearForm();
+	        	  FingerPrintValidationForm.this.clearForm();
 	              System.out.println(this.toString()+"Focus LOST:"+e);
 	              
 	          }
 	      });
     }
-
-    public void updateLabel(){
-    	m_mw.getM_ec().getM_lblInstruction().setText("<html><font color='yellow'>Finger Print Enrollment</font> </html>");
+    
+    public void updateLabel()
+    {
+    	m_mw.getM_ec().getM_lblInstruction().setText("<html><font color='yellow'>Finger Print Verification</font> </html>");
     }
 
 	public void addComponentToPane() {
+         
         //Create the "cards".
         JPanel card1 = new JPanel();
         m_lblInputBadgeNum = new JLabel("Enter Badge Number:");
         m_txtBadgeNum = new JTextField(12);
-        card1.setName(PANEL_ID);
+        card1.setName(DEMO_ID);
         card1.setSize(this.getSize());
         JPanel textBoxPanel = new JPanel();
         textBoxPanel.add(m_lblInputBadgeNum);
@@ -155,7 +185,7 @@ public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollme
         card2.setSize(this.getSize());
         m_lblInputFingerNum = new JLabel("Enter Finger Number:");
         m_txtFingerNum =  new JTextField(5);
-        card2.setName(PANEL_FPN);
+        card2.setName(DEMO_FPN);
         JPanel textBoxPanel2 = new JPanel();
         textBoxPanel2.setMaximumSize(this.getSize());
         textBoxPanel2.add(m_lblInputFingerNum);
@@ -163,34 +193,33 @@ public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollme
         textBoxPanel2.setAlignmentX(Component.CENTER_ALIGNMENT);
         textBoxPanel2.setAlignmentY(Component.CENTER_ALIGNMENT);
         card2.add(textBoxPanel2);
-        card2.add(new JButton("Press ENTER to Enroll"));
+        card2.add(new JButton("Press ENTER to Confirm"));
         card2.setOpaque(false);
         
         JPanel card3 = new JPanel();
         card3.setSize(this.getSize());
-        m_lblEnrollmentStatus = new JLabel("Enrollment:");
-        m_lblEnrollmentStatus.setAlignmentX(Component.CENTER_ALIGNMENT);
-        m_lblEnrollmentStatus.setOpaque(false);
-        m_lblEnrollmentStatus.setForeground(Color.yellow);
-        
-        m_txtEnrollmentResult = new JTextPane();
-        m_txtEnrollmentResult.setContentType("text/html");
-        m_txtEnrollmentResult.setFont(new Font("Times", Font.ROMAN_BASELINE, 12));
-//        m_txtEnrollmentResult.setLineWrap(true);
-//        m_txtEnrollmentResult.setWrapStyleWord(true);
-        m_txtEnrollmentResult.setEditable(false);
-        m_txtEnrollmentResult.setOpaque(false);
-        m_txtEnrollmentResult.setForeground(Color.white);
-        m_txtEnrollmentResult.setAlignmentX(Component.CENTER_ALIGNMENT);
+        m_lblStatus = new JLabel("Status:");
+        m_lblStatus.setAlignmentX(Component.CENTER_ALIGNMENT);
+        m_lblStatus.setForeground(Color.yellow);
+        m_lblStatus.setOpaque(false);
+        m_txtResult = new JTextPane();
+        m_txtResult.setContentType("text/html"); 
+        m_txtResult.setFont(new Font("Times", Font.ROMAN_BASELINE, 12));
+        m_txtResult.setForeground(Color.white);
+//        m_txtResult.setLineWrap(true);
+//        m_txtResult.setWrapStyleWord(true);
+        m_txtResult.setEditable(false);
+        m_txtResult.setOpaque(false);
+        m_txtResult.setAlignmentX(Component.CENTER_ALIGNMENT);
         JPanel textBoxPanel3 = new JPanel();
         textBoxPanel3.setSize(m_width, m_height);
         textBoxPanel3.setLayout(new BoxLayout(textBoxPanel3, BoxLayout.Y_AXIS));
-        textBoxPanel3.add(Box.createVerticalGlue());
-        textBoxPanel3.add(m_lblEnrollmentStatus);
+        textBoxPanel3.add(Box.createGlue());
+        textBoxPanel3.add(m_lblStatus);
         textBoxPanel3.add(Box.createVerticalStrut(5));
-        textBoxPanel3.add(m_txtEnrollmentResult);
+        textBoxPanel3.add(m_txtResult);
 		
-        card3.setName(PANEL_STATUS);
+        card3.setName(DEMO_STATUS);
         textBoxPanel3.setAlignmentX(Component.CENTER_ALIGNMENT);
         textBoxPanel3.setAlignmentY(Component.CENTER_ALIGNMENT);
         textBoxPanel3.setOpaque(false);
@@ -200,58 +229,56 @@ public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollme
         //Create the panel that contains the "cards".
         m_cl = new CardLayout();
         setLayout(m_cl);
-        add(card1,PANEL_ID);
-        add(card2,PANEL_FPN);
-        add(card3,PANEL_STATUS);
+        add(card1,DEMO_ID);
+        add(card2,DEMO_FPN);
+        add(card3,DEMO_STATUS);
     }
 
 	@Override
 	public void setBadge(String badge) {
 		// TODO Auto-generated method stub
 		System.out.println("Badge Identified: "+badge);
+		m_lblStatus.setText("Badge Identified: "+ "<html><font Color=red>"+ badge +"</font></html>");
 		
 	}
 
-	@Override
-	public void setStepCount(int count) {
-		// TODO Auto-generated method stub
-		//System.out.println("Start");
-		System.out.println("Please place finger "+ count + " times");
-		m_lblEnrollmentStatus.setText("\nPlease place finger "+ count + " times");
-		
-	}
-
-	@Override
-	public void onReadyForFinger(int step, boolean repeatOnReaderError) {
-		// TODO Auto-generated method stub
-		switch(step){
-		case 1:
-			//MainWindow.placefingersound.start();
-			System.out.println("Please place finger Step: "+ step + " Error: " + repeatOnReaderError);
-			m_lblEnrollmentStatus.setText("\nPlease place finger Step: "+ step);
-			break;
-		case 2:
-			//MainWindow.placefingeragainsound.start();
-			System.out.println("Please place finger Step: "+ step + " Error: " + repeatOnReaderError);
-			m_lblEnrollmentStatus.setText("\nPlease place finger Step: "+ step );
-			break;
-		case 3:
-			//MainWindow.placefingeragainsound.start();
-			System.out.println("Please place finger Step: "+ step + " Error: " + repeatOnReaderError);
-			m_lblEnrollmentStatus.setText("\nPlease place finger Step: "+ step );
-			break;
-		}
-		
-	}
-
-	@Override
-	public void onFingerPrintRead(int step) {
-		// TODO Auto-generated method stub
-		//MainWindow.successbuzzersound.start();
-		System.out.println("Please Remove Finger Step: "+ step + "  ");
-		m_lblEnrollmentStatus.setText("\nPlease Remove finger Step: "+ step + " ");
-		
-	}
+//	public void setStepCount(int count) {
+//		// TODO Auto-generated method stub
+//		System.out.println("Start");
+//		System.out.println("Please place finger "+ count + " times");
+//		m_lblStatus.setText("\nPlease place finger "+ count + " times");
+//		
+//	}
+//
+//	public void onReadyForFinger(int step, boolean repeatOnReaderError) {
+//		// TODO Auto-generated method stub
+//		switch(step){
+//		case 1:
+//			//MainWindow.placefingersound.start();
+//			System.out.println("Please place finger Step: "+ step + " Error: " + repeatOnReaderError);
+//			m_lblStatus.setText("\nPlease place finger Step: "+ step);
+//			break;
+//		case 2:
+//			//MainWindow.placefingeragainsound.start();
+//			System.out.println("Please place finger Step: "+ step + " Error: " + repeatOnReaderError);
+//			m_lblStatus.setText("\nPlease place finger Step: "+ step );
+//			break;
+//		case 3:
+//			//MainWindow.placefingeragainsound.start();
+//			System.out.println("Please place finger Step: "+ step + " Error: " + repeatOnReaderError);
+//			m_lblStatus.setText("\nPlease place finger Step: "+ step );
+//			break;
+//		}
+//		
+//	}
+//
+//	public void onFingerPrintRead(int step) {
+//		// TODO Auto-generated method stub
+//		//MainWindow.successbuzzersound.start();
+//		System.out.println("Please Remove Finger Step: "+ step + "  ");
+//		m_lblStatus.setText("\nPlease Remove finger Step: "+ step + " ");
+//		
+//	}
 	
 	@SuppressWarnings("serial")
 	public void goDemo() {
@@ -262,14 +289,14 @@ public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollme
     	}
 		System.out.println("goDemo!");
 		setInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, getInputMap());
-	    KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
-	    getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(key, "pressed");
-	    getActionMap().put("pressed", new AbstractAction(){         
+	    KeyStroke key_enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+	    getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(key_enter, "enter_pressed");
+	    getActionMap().put("enter_pressed", new AbstractAction(){         
 
 			public void actionPerformed(ActionEvent arg0) {
-				m_strCurrentCardName = FingerPrintEnrollForm.this.getCurrentCardName();
+				m_strCurrentCardName = FingerPrintValidationForm.this.getCurrentCardName();
 	            System.out.println("Key Enter pressed, I am in "+m_strCurrentCardName);
-	            FingerPrintEnrollForm.this.handleAction();
+	            FingerPrintValidationForm.this.handleAction();
 			} 
 	    });
 	}
@@ -286,37 +313,38 @@ public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollme
 	
 	private void handleAction(){
 		switch(CardNames.valueOf(m_strCurrentCardName)){
-        case Input_Badge_ID:
+        case Demo_Badge_ID:
         	m_strBadgeNum = m_txtBadgeNum.getText();
         	if (m_strBadgeNum != null){
-        		m_cl.next(FingerPrintEnrollForm.this);
+        		m_cl.next(FingerPrintValidationForm.this);
         		if (! m_txtFingerNum.requestFocusInWindow()){
             		m_txtFingerNum.requestFocus();
             	}
         	}
         	break;
-        case Input_FingerPrint_Number:
+        case Demo_FingerPrint_Number:
         	String strFingerNum = m_txtFingerNum.getText();
         	if (strFingerNum != null){
         		m_nFingerNum = Integer.parseInt(strFingerNum);
-        		m_cl.next(FingerPrintEnrollForm.this);
-        		m_lblEnrollmentStatus.setText("Employee ID: "+m_strBadgeNum+" Finger: "+m_nFingerNum);
-        		if (! m_lblEnrollmentStatus.requestFocusInWindow()){
-            		m_lblEnrollmentStatus.requestFocus();
+        		m_cl.next(FingerPrintValidationForm.this);
+        		m_lblStatus.setText("Employee ID: "+m_strBadgeNum+" Finger: "+m_nFingerNum);
+        		if (! m_lblStatus.requestFocusInWindow()){
+            		m_lblStatus.requestFocus();
             	}
-        		(new FingerPrintEnroll()).execute(); //Swing worker class.
+        		
+        		(new FingerPrintBadgeStatus()).execute(); //Swing worker class.
         	}
         	break;
-        case Enrollment_Status:
+        case Demo_Status:
         	clearForm();
-        	m_cl.first(FingerPrintEnrollForm.this);
+        	m_cl.first(FingerPrintValidationForm.this);
         	if (! m_txtBadgeNum.requestFocusInWindow()){
         		m_txtBadgeNum.requestFocus();
         	}
         	break;
         default:
         	System.out.println("I am in default state.");
-        	m_cl.first(FingerPrintEnrollForm.this);		
+        	m_cl.first(FingerPrintValidationForm.this);		
 		}
 	}
 
@@ -324,6 +352,7 @@ public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollme
 		System.out.println("I am clearing form...");
 		m_txtBadgeNum.setText("");
 		m_txtFingerNum.setText("");
-		m_txtEnrollmentResult.setText("");
+		m_txtResult.setText("");
 	}
 }
+

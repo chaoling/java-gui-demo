@@ -1,15 +1,26 @@
 package com.adp.clocks.synergy2416.demo;
 
+import java.awt.AWTEvent;
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.KeyboardFocusManager;
+import java.awt.Point;
 import java.awt.SplashScreen;
+import java.awt.Toolkit;
+import java.awt.event.AWTEventListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+
+import com.adp.clocks.synergy2416.demo.ClockEventDispatcher.CLOCK_STATUS;
 
 public class MainWindow extends JFrame {
 
@@ -19,16 +30,7 @@ public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 8210857356700426265L;
 	private static EventController m_ec;
 	private static ClockEventDispatcher m_ced;
-	
-	public static DemoSound greetingsound = new DemoSound("res/hello.wav");
-	public static DemoSound enrollsound = new DemoSound("res/Enroll.wav");
-	public static DemoSound beepsound = new DemoSound("res/beep.wav");
-	public static DemoSound placefingersound = new DemoSound("res/fingerPlace.wav");
-	public static DemoSound placefingeragainsound = new DemoSound("res/fingerPlaceAgain.wav");
-	public static DemoSound keypadsound = new DemoSound("res/KeyAccept.wav");
-	public static DemoSound successbuzzersound = new DemoSound("res/SuccessBuzzer.wav");
-	
-	//private static FPU m_fpu = FPU.getInstance();
+	private static AudioPool m_ap;
 
 	static void renderSplashFrame(Graphics2D g, int frame) {
         final String[] comps = {"camera", "fingerprintreader", "keypad"};
@@ -77,6 +79,10 @@ public class MainWindow extends JFrame {
 		return m_ced;
 	}
 
+	public static AudioPool getM_ap() {
+		return m_ap;
+	}
+
 	/**
 	 * Create the frame.
 	 */
@@ -108,15 +114,54 @@ public class MainWindow extends JFrame {
 	private static void startMainThread() {
 		//Create and set up the main window.
 		MainWindow m_frame = new MainWindow("ADPDemoWindow");
-		
+		m_ap = new AudioPool();
+		m_ap.reloadAudioSounds();
 		m_ced = new ClockEventDispatcher();
 		m_ec = new EventController(m_frame);
 		m_ec.initialize();
 		m_ced.initialize();
 		
+		
 		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher(m_ced);
+        m_frame.addFocusListener(new FocusListener(){
+            public void focusGained(FocusEvent e){
+                System.out.println("Focus GAINED:"+e);
+            }
+            public void focusLost(FocusEvent e){
+                System.out.println("Focus LOST:"+e);
+
+                // FIX FOR GNOME/XWIN FOCUS BUG
+                e.getComponent().requestFocus();
+            }
+        });
+        
+        //#IF DEBUG
+        Toolkit.getDefaultToolkit().addAWTEventListener( new AWTEventListener(){
+            public void eventDispatched(AWTEvent e) {
+                    System.out.println("AWT:"+e);
+                    System.out.flush();
+            }
+        }, FocusEvent.FOCUS_EVENT_MASK | WindowEvent.WINDOW_FOCUS_EVENT_MASK | WindowEvent.WINDOW_EVENT_MASK);
 	}
 
+	public void returnToMain() {
+		if (m_ced != null){
+		m_ced.emit(CLOCK_STATUS.CLOCKSTATUS_MENU);
+		}
+	}
+	
+public static void simulateMouseClick(Component source) {
+    // create a simulated mouse event
+     Point p = source.getLocationOnScreen();
+    MouseEvent click = new MouseEvent(source, MouseEvent.BUTTON1, System.currentTimeMillis(),
+            0, p.x, p.y, 1, false);
+ 
+    // broadcast the mouse click to all registered mouse listeners
+    MouseListener[] listeners = (MouseListener[]) source.getListeners(MouseListener.class);
+    for (int i=0; i<listeners.length; i++) {
+        listeners[i].mouseClicked(click);
+    }
+}
 	
 }
