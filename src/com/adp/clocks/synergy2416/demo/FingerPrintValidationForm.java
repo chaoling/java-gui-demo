@@ -30,17 +30,17 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	final static String DEMO_ID = "Demo_Badge_ID";
-    final static String DEMO_FPN = "Demo_FingerPrint_Number";
+	final static String DEMO_ID = "Demo_Employee_ID";
+    //final static String DEMO_FPN = "Demo_FingerPrint_Number";
     final static String DEMO_STATUS = "Demo_Status";
     
-	private JTextField m_txtBadgeNum;
-	private JLabel m_lblInputBadgeNum;
-	private JLabel m_lblInputFingerNum;
-	private JTextField m_txtFingerNum;
+	private JTextField m_txtEmployeeNum;
+	private JLabel m_lblInputEmployeeNum;
+	//private JLabel m_lblInputFingerNum;
+	//private JTextField m_txtFingerNum;
 	private JLabel m_lblStatus;
-    private String m_strBadgeNum;
-    private int m_nFingerNum;
+    private String m_strEmployeeNum;
+    private int m_nFingerNum = 0; //For demo, always asume finger 0
     private CardLayout m_cl;
     private String m_strCurrentCardName;
 	private JTextPane m_txtResult;
@@ -49,32 +49,30 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
 	private MainWindow m_mw;
 	
 	public enum CardNames {
-    	Demo_Badge_ID,
-    	Demo_FingerPrint_Number,
+    	Demo_Employee_ID,
+    	//Demo_FingerPrint_Number,
     	Demo_Status
     }
     
     class FingerPrintValidation extends SwingWorker<String, Object> {
         @Override
         public String doInBackground() {
-            return FPU.validateEmployee(m_strBadgeNum, m_nFingerNum);
+            return FPU.validateEmployee(m_strEmployeeNum, m_nFingerNum);
         }
 
         @Override
         protected void done() {
             try { 
             	String strResult = get();
-                m_lblStatus.setText("Employee ID: "+m_strBadgeNum+" Finger: "+m_nFingerNum);
+                m_lblStatus.setText("Employee ID: "+m_strEmployeeNum+" Finger: "+m_nFingerNum);
                 m_txtResult.setText("<html><font color=black>"+strResult+"<br> Press Enter to Restart "+"<br> Press MENU to the main menu</font><html>");
                 
                 if (strResult.compareTo("Succeed!") == 0) {
                 	FPU.Light.RED.off();
                 	FPU.Light.GREEN.on();
-                	//MainWindow.enrollsound.start();
                 } else {
                 	FPU.Light.GREEN.off();
                 	FPU.Light.RED.on();
-                	//MainWindow.beepsound.start();
                 }
             } catch (Exception ignore) {
             	
@@ -82,17 +80,17 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
         }
     }
     
-    class FingerPrintBadgeStatus extends SwingWorker<String, Object> {
+    class FingerPrintEmployeeStatus extends SwingWorker<String, Object> {
         @Override
         public String doInBackground() {
-            return FPU.badgeStatus(m_strBadgeNum, m_nFingerNum);
+            return FPU.badgeStatus(m_strEmployeeNum, m_nFingerNum);
         }
 
         @Override
         protected void done() {
             try { 
             	String strResult = get();
-                m_lblStatus.setText("Employee ID: "+m_strBadgeNum+" Finger: "+m_nFingerNum);
+                m_lblStatus.setText("Employee ID: "+m_strEmployeeNum+" Finger: "+m_nFingerNum);
                 if (strResult.compareTo("Succeed!") == 0) {
                 	 m_txtResult.setText("<html><font color=black>Press Finger on The FP reader to Verify </font><html>");
                 	FPU.Light.RED.off();
@@ -113,10 +111,8 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
     
     public FingerPrintValidationForm(MainWindow mw) {
     	this.m_mw = mw;
-    	//m_bContinue = true;
     	setSize(m_width, m_height);
     	addComponentToPane();
-    	//attachKeyListeners();
     	setOpaque(false);
     	this.addKeyListener(new KeyListener(){
 
@@ -166,13 +162,13 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
          
         //Create the "cards".
         JPanel card1 = new JPanel();
-        m_lblInputBadgeNum = new JLabel("Enter Badge Number:");
-        m_txtBadgeNum = new JTextField(12);
+        m_lblInputEmployeeNum = new JLabel("Enter Employee Number:");
+        m_txtEmployeeNum = new JTextField(12);
         card1.setName(DEMO_ID);
         card1.setSize(this.getSize());
         JPanel textBoxPanel = new JPanel();
-        textBoxPanel.add(m_lblInputBadgeNum);
-        textBoxPanel.add(m_txtBadgeNum);
+        textBoxPanel.add(m_lblInputEmployeeNum);
+        textBoxPanel.add(m_txtEmployeeNum);
         textBoxPanel.setMaximumSize(this.getSize());
         //textBoxPanel.setBounds(90, 150, 300, 40);
         textBoxPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -181,31 +177,31 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
         card1.add(new JButton("Press ENTER to Confirm"));
         card1.setOpaque(false);
          
-        JPanel card2 = new JPanel();
-        card2.setSize(this.getSize());
-        m_lblInputFingerNum = new JLabel("Enter Finger Number:");
-        m_txtFingerNum =  new JTextField(5);
-        card2.setName(DEMO_FPN);
-        JPanel textBoxPanel2 = new JPanel();
-        textBoxPanel2.setMaximumSize(this.getSize());
-        textBoxPanel2.add(m_lblInputFingerNum);
-        textBoxPanel2.add(m_txtFingerNum);
-        textBoxPanel2.setAlignmentX(Component.CENTER_ALIGNMENT);
-        textBoxPanel2.setAlignmentY(Component.CENTER_ALIGNMENT);
-        card2.add(textBoxPanel2);
-        card2.add(new JButton("Press ENTER to Confirm"));
-        card2.setOpaque(false);
+//        JPanel card2 = new JPanel();
+//        card2.setSize(this.getSize());
+//        m_lblInputFingerNum = new JLabel("Enter Finger Number:");
+//        m_txtFingerNum =  new JTextField(5);
+//        card2.setName(DEMO_FPN);
+//        JPanel textBoxPanel2 = new JPanel();
+//        textBoxPanel2.setMaximumSize(this.getSize());
+//        textBoxPanel2.add(m_lblInputFingerNum);
+//        textBoxPanel2.add(m_txtFingerNum);
+//        textBoxPanel2.setAlignmentX(Component.CENTER_ALIGNMENT);
+//        textBoxPanel2.setAlignmentY(Component.CENTER_ALIGNMENT);
+//        card2.add(textBoxPanel2);
+//        card2.add(new JButton("Press ENTER to Confirm"));
+//        card2.setOpaque(false);
         
         JPanel card3 = new JPanel();
         card3.setSize(this.getSize());
         m_lblStatus = new JLabel("Status:");
         m_lblStatus.setAlignmentX(Component.CENTER_ALIGNMENT);
-        m_lblStatus.setForeground(Color.yellow);
+        m_lblStatus.setForeground(Color.red);
         m_lblStatus.setOpaque(false);
         m_txtResult = new JTextPane();
         m_txtResult.setContentType("text/html"); 
         m_txtResult.setFont(new Font("Times", Font.ROMAN_BASELINE, 12));
-        m_txtResult.setForeground(Color.white);
+        m_txtResult.setForeground(Color.black);
 //        m_txtResult.setLineWrap(true);
 //        m_txtResult.setWrapStyleWord(true);
         m_txtResult.setEditable(false);
@@ -230,15 +226,15 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
         m_cl = new CardLayout();
         setLayout(m_cl);
         add(card1,DEMO_ID);
-        add(card2,DEMO_FPN);
+        //add(card2,DEMO_FPN);
         add(card3,DEMO_STATUS);
     }
 
 	@Override
 	public void setBadge(String badge) {
 		// TODO Auto-generated method stub
-		System.out.println("Badge Identified: "+badge);
-		m_lblStatus.setText("Badge Identified: "+ "<html><font Color=red>"+ badge +"</font></html>");
+		System.out.println("Employee Identified: "+badge);
+		m_lblStatus.setText("Employee Identified: "+ "<html><font Color=red>"+ badge +"</font></html>");
 		
 	}
 
@@ -284,8 +280,8 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
 	public void goDemo() {
 		m_cl.first(this);
 		setFocusable(true);
-		if (! m_txtBadgeNum.requestFocusInWindow()){
-    		m_txtBadgeNum.requestFocus();
+		if (! m_txtEmployeeNum.requestFocusInWindow()){
+    		m_txtEmployeeNum.requestFocus();
     	}
 		System.out.println("goDemo!");
 		setInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, getInputMap());
@@ -308,38 +304,40 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
 				return myName;
 			}
 		}
-		return "Invalid";
+		return "unknown";
 	}
 	
 	private void handleAction(){
 		switch(CardNames.valueOf(m_strCurrentCardName)){
-        case Demo_Badge_ID:
-        	m_strBadgeNum = m_txtBadgeNum.getText();
-        	if (m_strBadgeNum != null){
+        case Demo_Employee_ID:
+        	m_strEmployeeNum = m_txtEmployeeNum.getText();
+        	if (m_strEmployeeNum != null){
         		m_cl.next(FingerPrintValidationForm.this);
-        		if (! m_txtFingerNum.requestFocusInWindow()){
-            		m_txtFingerNum.requestFocus();
-            	}
-        	}
-        	break;
-        case Demo_FingerPrint_Number:
-        	String strFingerNum = m_txtFingerNum.getText();
-        	if (strFingerNum != null){
-        		m_nFingerNum = Integer.parseInt(strFingerNum);
-        		m_cl.next(FingerPrintValidationForm.this);
-        		m_lblStatus.setText("Employee ID: "+m_strBadgeNum+" Finger: "+m_nFingerNum);
+        		m_lblStatus.setText("Employee ID: "+m_strEmployeeNum+" Finger: "+m_nFingerNum);
         		if (! m_lblStatus.requestFocusInWindow()){
             		m_lblStatus.requestFocus();
             	}
-        		
-        		(new FingerPrintBadgeStatus()).execute(); //Swing worker class.
+        		(new FingerPrintEmployeeStatus()).execute(); //Swing worker class.
         	}
         	break;
+//        case Demo_FingerPrint_Number:
+//        	String strFingerNum = m_txtFingerNum.getText();
+//        	if (strFingerNum != null){
+//        		m_nFingerNum = Integer.parseInt(strFingerNum);
+//        		m_cl.next(FingerPrintValidationForm.this);
+//        		m_lblStatus.setText("Employee ID: "+m_strEmployeeNum+" Finger: "+m_nFingerNum);
+//        		if (! m_lblStatus.requestFocusInWindow()){
+//            		m_lblStatus.requestFocus();
+//            	}
+//        		
+//        		(new FingerPrintEmployeeStatus()).execute(); //Swing worker class.
+//        	}
+//        	break;
         case Demo_Status:
         	clearForm();
         	m_cl.first(FingerPrintValidationForm.this);
-        	if (! m_txtBadgeNum.requestFocusInWindow()){
-        		m_txtBadgeNum.requestFocus();
+        	if (! m_txtEmployeeNum.requestFocusInWindow()){
+        		m_txtEmployeeNum.requestFocus();
         	}
         	break;
         default:
@@ -350,8 +348,8 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
 
 	private void clearForm() {
 		System.out.println("I am clearing form...");
-		m_txtBadgeNum.setText("");
-		m_txtFingerNum.setText("");
+		m_txtEmployeeNum.setText("");
+		//m_txtFingerNum.setText("");
 		m_txtResult.setText("");
 	}
 }

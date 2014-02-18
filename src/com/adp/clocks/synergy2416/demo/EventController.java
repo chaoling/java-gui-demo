@@ -179,7 +179,7 @@ public class EventController implements ClockStatusListener {
 		
 			m_lblFormName = new JLabel();
 			//m_lblInstruction.setIcon(new ImageIcon(new ImageIcon(MainWindow.class.getResource(ResPath+"synel.png")).getImage().getScaledInstance(LogoSize, LogoSize, java.awt.Image.SCALE_SMOOTH)));
-			m_lblFormName.setIcon(new ImageIcon(new ImageIcon(MainWindow.class.getResource(ResPath+"SynelLogoTransParent.png")).getImage().getScaledInstance(3*LogoSize, LogoSize, java.awt.Image.SCALE_SMOOTH)));
+			m_lblFormName.setIcon(new ImageIcon(new ImageIcon(MainWindow.class.getResource(ResPath+"SynelLogoSmall.png")).getImage().getScaledInstance(3*LogoSize, LogoSize, java.awt.Image.SCALE_SMOOTH)));
 			m_lblFormName.setAlignmentY(Component.TOP_ALIGNMENT);
 			
 			m_pHeader = new JPanel();
