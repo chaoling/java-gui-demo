@@ -195,7 +195,7 @@ public class EventController implements ClockStatusListener {
 	    m_cards.show(m_cardPanel, "welcome");
 	    m_welcomeForm.updateLabel();
 	    m_welcomeForm.requestFocusInWindow();
-	    m_welcomeForm.IdentifyEmp();
+	    //m_welcomeForm.IdentifyEmp();
 	}
 	
 	public void loadPlayVideoForm()

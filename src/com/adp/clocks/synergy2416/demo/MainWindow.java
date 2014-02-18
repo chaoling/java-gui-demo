@@ -1,17 +1,20 @@
 package com.adp.clocks.synergy2416.demo;
 
 import java.awt.AWTEvent;
+import java.awt.AWTException;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
+import java.awt.Robot;
 import java.awt.SplashScreen;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
@@ -139,6 +142,11 @@ public class MainWindow extends JFrame {
         //#IF DEBUG
         Toolkit.getDefaultToolkit().addAWTEventListener( new AWTEventListener(){
             public void eventDispatched(AWTEvent e) {
+            		if (e.toString().contains("JButton")) {
+            			System.out.println("JButton:"+e.getSource().toString());
+            			//MainWindow.simulateMouseClick((Component) e.getSource());
+            			MainWindow.simulateKeyPadClick(KeyEvent.VK_ESCAPE);	
+            		}
                     System.out.println("AWT:"+e);
                     System.out.flush();
             }
@@ -162,6 +170,23 @@ public static void simulateMouseClick(Component source) {
     for (int i=0; i<listeners.length; i++) {
         listeners[i].mouseClicked(click);
     }
+}
+
+public static void simulateKeyPadClick(int keycode){
+	Robot r = null;
+	try {
+		r = new Robot();
+	} catch (AWTException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+	if (r != null){
+		System.out.println("simulate press key!"+keycode);
+		try{Thread.sleep(50);}catch(InterruptedException e1){}
+		r.keyPress(keycode);
+		try{Thread.sleep(50);}catch(InterruptedException e1){}
+		r.keyRelease(keycode);
+	}
 }
 	
 }

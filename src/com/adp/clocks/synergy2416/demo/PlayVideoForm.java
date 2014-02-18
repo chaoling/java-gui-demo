@@ -1,10 +1,8 @@
 package com.adp.clocks.synergy2416.demo;
 
-import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.KeyboardFocusManager;
-import java.awt.Robot;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -28,6 +26,7 @@ public class PlayVideoForm extends JPanel {
 	private JLabel m_lblInstruction;
 	private MainWindow m_mw;
 	private Timer m_timer=new Timer();
+	private JDialog m_jd;
 
 
 	/**
@@ -90,6 +89,10 @@ public class PlayVideoForm extends JPanel {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
+					if (m_jd != null){
+						m_jd.dispose();
+						m_jd.setVisible(false);
+					}
 					
 					//m_mw.returnToMain();
 				}
@@ -107,19 +110,18 @@ public class PlayVideoForm extends JPanel {
 		
 		 this.addFocusListener(new FocusListener(){
 	          public void focusGained(FocusEvent e){
-	              System.out.println(PlayVideoForm.this.toString()+"Focus GAINED:"+e.getSource().toString());
-	              if (e.getSource().toString().contains("JButton")) {
-	            	  PlayVideoForm.this.switchFocus(e);
-	              }
+	              System.out.println("Focus GAINED:"+e.getSource().toString());
 	              
 	          }
 	          public void focusLost(FocusEvent e){
-	              System.out.println(PlayVideoForm.this.toString()+"Focus LOST:"+e);
+	              System.out.println("Focus LOST:"+e.getSource().toString());
 
 	              // FIX FOR GNOME/XWIN FOCUS BUG
 	              System.out.println("Current KFM is "+ KeyboardFocusManager.getCurrentKeyboardFocusManager().toString());
 	              //PlayVideoForm.this.requestFocusInWindow();
+	              showPopUpDialog();
 	          }
+			
 	      });
 	}
 	
@@ -156,29 +158,12 @@ public class PlayVideoForm extends JPanel {
             this.requestFocusInWindow();
 	        //m_mw.returnToMain();
 	}
-
-	public void switchFocus(FocusEvent e) {
+	
+	private void showPopUpDialog() {
 		// TODO Auto-generated method stub
-        JOptionPane optionPane = new JOptionPane("Focus Lost",
-      		  						JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION);
-        JDialog jd = optionPane.createDialog(this, null);
-        jd.setVisible(true);
-        MainWindow.simulateMouseClick(e.getComponent());
-        //simulate enter key pressed event;
-        Robot r = null;
-		try {
-			r = new Robot();
-		} catch (AWTException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		if (r != null){
-			System.out.println("simulate press enter key!");
-			try{Thread.sleep(50);}catch(InterruptedException e1){}
-			r.keyPress(KeyEvent.VK_ENTER);
-			try{Thread.sleep(50);}catch(InterruptedException e1){}
-			r.keyRelease(KeyEvent.VK_ENTER);
-		}
-        jd.dispose();
-	}	
+		JOptionPane optionPane = new JOptionPane("Focus Lost",
+						JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION);
+		m_jd = optionPane.createDialog(this, null);
+		m_jd.setVisible(true);
+	}
 }
