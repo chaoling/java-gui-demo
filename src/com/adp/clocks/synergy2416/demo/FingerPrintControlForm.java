@@ -8,34 +8,32 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
 public class FingerPrintControlForm extends JPanel {
 
-	private static final String ResPath = "/com/adp/clocks/synergy2416/res/";
+	
 	private static final long serialVersionUID = -5200775456600807554L;
-	private AtomicInteger m_nidControlThread;
+	private static final String ResPath = "/com/adp/clocks/synergy2416/res/";
 	private boolean m_bRunIdControlThread;
 	private MainWindow m_mw;
 	private JLabel m_lblStatusLabel;
 	private JPanel m_pMsg;
-	private AtomicInteger m_nIdControlThread;
 	private static Timer m_idControlTimer;
+	private FPIdWorker m_idCtlWorker;
+	private ImageIcon m_icon;
 	
 	/**
 	 * Initialize the contents of the frame.
 	 * @param mw 
 	 */
 	public FingerPrintControlForm(MainWindow mw) {
-		m_nidControlThread = new AtomicInteger(0);
 		this.m_mw = mw;
 		this.setLayout(new BorderLayout());
 		addComponentsToPane();
@@ -79,12 +77,16 @@ public class FingerPrintControlForm extends JPanel {
 		  this.addFocusListener(new FocusListener(){
 	          public void focusGained(FocusEvent e){
 	        	  m_bRunIdControlThread = true;
-	        	  runIdControlThreadAgain();
+	        	  //runIdControlThreadAgain();
 	          }
 	          public void focusLost(FocusEvent e){
 	             
 	              m_bRunIdControlThread = false;
-	              if (m_idControlTimer.isRunning()){
+	            
+	              if (m_idCtlWorker != null && ! m_idCtlWorker.isDone()){
+	            	  m_idCtlWorker.cancel(true);
+	              }
+	              if (m_idControlTimer != null && m_idControlTimer.isRunning()){
 	            	  m_idControlTimer.stop();
 	              }
 	          }
@@ -93,8 +95,8 @@ public class FingerPrintControlForm extends JPanel {
 	}
 	
 	protected void runIdControlThreadAgain() {
-		// TODO Auto-generated method stub
-		if (m_bRunIdControlThread && m_nIdControlThread.get()==0) {
+		System.out.println("m_nThread is "+FPIdWorker.m_nThread.get());
+		if (m_bRunIdControlThread && FPIdWorker.m_nThread.get()==0) {
 			updateLabel();
 			IdControl();
 		}
@@ -108,7 +110,7 @@ public class FingerPrintControlForm extends JPanel {
 		m_pMsg.setSize(300, 200);
 		m_pMsg.setLayout(new BoxLayout(m_pMsg, BoxLayout.Y_AXIS));
 		//m_pMsg.add(m_lblWelcomeLabel);
-		m_pMsg.add(Box.createVerticalStrut(25));
+		m_pMsg.add(Box.createVerticalStrut(15));
 		m_pMsg.add(m_lblStatusLabel);
 		m_pMsg.setOpaque(false);
 		add(m_pMsg,BorderLayout.CENTER);
@@ -120,53 +122,23 @@ public class FingerPrintControlForm extends JPanel {
 		m_mw.getM_ec().getLblCameraImage().setVisible(false);
 		m_mw.getM_ec().getLblFpuEnrollImage().setVisible(false);
 		m_mw.getM_ec().getLblFpuControlImage().setVisible(true);
-		m_lblStatusLabel.setText("<html><font color = Black size = 16>Press Finger to Open the Door!</font></html>");
+		m_lblStatusLabel.setText("<html><font color=black>Please Place Finger</font></html>");
 		FPU.Light.GREEN.off();
      	FPU.Light.RED.off();
 	}
 	
-	class IdControlWorker extends SwingWorker<String, Object> {
-        @Override
-        public String doInBackground() {
-        	m_nidControlThread.getAndIncrement();
-            return FPU.identifyEmployee();
-        }
-
-        @Override
-        protected void done() {
-            try { 
-            	String strResult = get();
-            	System.out.println(strResult);
-            	if (strResult.compareTo("Succeed!") == 0) {
-                  	m_lblStatusLabel.setText("<html><font color=black size=16>Punch Accepted!<br>Opening the Door!</font></html>");
-                	m_lblStatusLabel.repaint();
-                	FPU.Light.RED.off();
-                  	FPU.Light.GREEN.on();
-                  	MainWindow.getM_ap().playSuccessSound();
-                  } else {
-                  	m_lblStatusLabel.setText("<html><font color=black size=16>"+strResult+"</font></html>");
-                	m_lblStatusLabel.repaint();
-                  	FPU.Light.GREEN.off();
-                  	FPU.Light.RED.on();
-                  	MainWindow.getM_ap().playKeypadSound();
-                  }
-            } catch (Exception ignore) {
-            	
-            }
-            m_nidControlThread.getAndDecrement();
-            m_idControlTimer.start();
-        }
-    }
 	
 	public void IdControl() {
-		(new IdControlWorker()).execute();	
+		m_idCtlWorker = new FPIdWorker(m_lblStatusLabel,m_idControlTimer);	
+		m_idCtlWorker.execute();
 	}
 	
 	private void createStatusLabel(){
-		ImageIcon icon = createImageIcon(ResPath+"gif_door_in.gif",
+		m_icon = createImageIcon(ResPath+"gif_door_in.gif",
                 "a door open/close gif file");
-		m_lblStatusLabel = new JLabel("Image and Text", icon, JLabel.CENTER);
-		m_lblStatusLabel.setFont(new Font("Times", Font.PLAIN, 16));
+		m_lblStatusLabel = new JLabel("Press Finger to Open the Door!");
+		m_lblStatusLabel.setIcon(m_icon);
+		m_lblStatusLabel.setFont(new Font("Times", Font.PLAIN, 20));
 		m_lblStatusLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		m_lblStatusLabel.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
 		m_lblStatusLabel.setOpaque(false);
@@ -181,29 +153,4 @@ public class FingerPrintControlForm extends JPanel {
 					return null;
 				}
 	}
-	
-//	public void IdentifyEmployeeBlocking(){
-//		System.out.println("run IdEmp in blocking mode");
-//		String strResult = FPU.identifyEmployee();
-//		if (strResult.compareTo("Succeed!") == 0) {
-//          	
-//          	m_lblStatusLabel.setText("<html><font color=black>Punch Accepted!</font></html>");
-//          	m_lblStatusLabel.repaint();
-//          	FPU.Light.RED.off();
-//          	FPU.Light.GREEN.on();
-//          	MainWindow.getM_ap().playSuccessSound();
-//          } else {
-//        	FPU.Light.GREEN.off();
-//            FPU.Light.RED.on();
-//          	m_lblStatusLabel.setText("<html><font color=black>"+strResult+"</font></html>");
-//        	m_lblStatusLabel.repaint();
-//          	MainWindow.getM_ap().playKeypadSound();
-//          }
-//		try {
-//			Thread.sleep(5*1000L);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	}
 }

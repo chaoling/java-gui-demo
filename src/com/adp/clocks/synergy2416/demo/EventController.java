@@ -38,7 +38,7 @@ public class EventController implements ClockStatusListener {
 	private JPanel m_cardPanel;
 	private WelcomeForm m_welcomeForm;
 	private FingerPrintEnrollForm m_fingerPrintEnrollForm;
-	private FingerPrintControlForm m_fingerPrintControlForm;
+	//private FingerPrintControlForm m_fingerPrintControlForm;
 	private VideoForm m_videoDemoForm;
 	private ShowWebCamForm m_webCamDemoForm;
 	private JLabel m_lblBackground;
@@ -123,13 +123,13 @@ public class EventController implements ClockStatusListener {
 			m_videoDemoForm = new VideoForm(m_frame);
 			m_webCamDemoForm = new ShowWebCamForm(m_frame);
 			m_fingerPrintEnrollForm = new FingerPrintEnrollForm(m_frame);
-			m_fingerPrintControlForm = new FingerPrintControlForm(m_frame);
+			//m_fingerPrintControlForm = new FingerPrintControlForm(m_frame);
 			
 			m_cardPanel.add(m_welcomeForm,"welcome");
 			m_cardPanel.add(m_videoDemoForm,"videoDemo");
 			m_cardPanel.add(m_webCamDemoForm,"webcamDemo");
 			m_cardPanel.add(m_fingerPrintEnrollForm,"fpEnroll");
-			m_cardPanel.add(m_fingerPrintControlForm,"fpControl");
+			//m_cardPanel.add(m_fingerPrintControlForm,"fpControl");
 			
 			m_frame.getContentPane().add(m_pHeader,BorderLayout.NORTH);
 			m_frame.getContentPane().add(m_cardPanel,BorderLayout.CENTER);
@@ -230,12 +230,10 @@ public class EventController implements ClockStatusListener {
 	public void loadWelcomeForm()
 	{
 	    System.out.println("Loading WelcomeForm");
-	    FPU.Light.RED.off();
-    	FPU.Light.GREEN.off();
+	    m_welcomeForm.setM_bIsPiggyBack(false);
 	    m_cards.show(m_cardPanel, "welcome");
 	    m_welcomeForm.updateLabel();
 	    m_welcomeForm.requestFocusInWindow();
-	    //m_welcomeForm.IdentifyEmp();
 	}
 	
 	public void loadPlayVideoForm()
@@ -267,11 +265,15 @@ public class EventController implements ClockStatusListener {
 	public void loadFingerPrintControlForm()
 	{
 	    System.out.println("Loading FingerPrint Control Form");
-	    //new FingerPrintDemoForm(m_frame);
-	    m_cards.show(m_cardPanel, "fpControl");
-	    m_fingerPrintControlForm.updateLabel();
-	    m_fingerPrintControlForm.setFocusable(true);
-	    m_fingerPrintControlForm.requestFocusInWindow();
+	    m_welcomeForm.setM_bIsPiggyBack(true);
+	    m_cards.show(m_cardPanel, "welcome");
+	    m_welcomeForm.updateLabel();
+	    m_welcomeForm.requestFocusInWindow();
+//	    //new FingerPrintDemoForm(m_frame);
+//	    m_cards.show(m_cardPanel, "fpControl");
+//	    m_fingerPrintControlForm.updateLabel();
+//	    m_fingerPrintControlForm.setFocusable(true);
+//	    m_fingerPrintControlForm.requestFocusInWindow();
 	}
 	public void loadSysInforForm()
 	{

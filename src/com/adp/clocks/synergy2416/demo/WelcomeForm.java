@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
@@ -25,14 +26,27 @@ public class WelcomeForm extends JPanel {
 	
 
 	private static final long serialVersionUID = 319089484632562510L;
+	private static final String ResPath = "/com/adp/clocks/synergy2416/res/";
 	private  JLabel m_lblWelcomeLabel;
 	private JPanel m_pMsg;
 	private MainWindow m_mw;
-	private AtomicInteger m_nIdThread;
+	//private AtomicInteger m_nIdThread;
 	private boolean m_bRunIdThread;
+	//private IdentifyEmployeeWorker m_idEmpWorker;
 	private IdentifyEmployeeWorker m_idEmpWorker;
 	private static Timer m_idThreadTimer;
+	private boolean m_bIsPiggyBack; //PiggyBack on idControl form
+	public AtomicInteger m_nIdThread;
+	private ImageIcon m_iconDoorOpen;
 		
+	public boolean isM_bIsPiggyBack() {
+		return m_bIsPiggyBack;
+	}
+
+	public void setM_bIsPiggyBack(boolean bIsPiggyBack) {
+		this.m_bIsPiggyBack = bIsPiggyBack;
+	}
+
 	/**
 	 * Initialize the contents of the frame.
 	 * @param mw 
@@ -40,6 +54,9 @@ public class WelcomeForm extends JPanel {
 	public WelcomeForm(MainWindow mw) {
 		m_nIdThread = new AtomicInteger(0);
 		m_bRunIdThread = true;
+		m_bIsPiggyBack = false;
+		m_iconDoorOpen = createImageIcon(ResPath+"gif_door_in.gif",
+                "a door open/close gif file");
 		this.m_mw = mw;
 		this.setLayout(new BorderLayout());
 		addComponentsToPane();
@@ -90,11 +107,12 @@ public class WelcomeForm extends JPanel {
 	          public void focusLost(FocusEvent e){
 	              System.out.println(WelcomeForm.this.toString()+"Focus LOST:"+e);
 	              m_bRunIdThread = false;
-	              if (m_idThreadTimer != null && m_idThreadTimer.isRunning()){
-	            	  m_idThreadTimer.stop();
-	              }
+	            
 	              if (m_idEmpWorker != null && ! m_idEmpWorker.isDone()) {
 	            	  m_idEmpWorker.cancel(true);
+	              }
+	              if (m_idThreadTimer != null && m_idThreadTimer.isRunning()){
+	            	  m_idThreadTimer.stop();
 	              }
 	          }
 	      });
@@ -102,17 +120,24 @@ public class WelcomeForm extends JPanel {
 	}
 	
 	public void updateLabel(){
-		//m_mw.getM_ec().getM_lblInstruction().setText("<html><font color=black>Press <font color=red>F1-F4 </font> key to start demo funtions</font> </html>");
-		for (Component c : m_mw.getM_ec().getM_pMenuBar().getComponents()){
+		if (m_bIsPiggyBack){
+			m_mw.getM_ec().getLblVideoImage().setVisible(false);
+			m_mw.getM_ec().getLblCameraImage().setVisible(false);
+			m_mw.getM_ec().getLblFpuEnrollImage().setVisible(false);
+			m_mw.getM_ec().getLblFpuControlImage().setVisible(true);
+			m_lblWelcomeLabel.setText("<html><font color=black>Please Place Finger</font></html>");
+			m_lblWelcomeLabel.setIcon(null);
+		} else {
+			for (Component c : m_mw.getM_ec().getM_pMenuBar().getComponents()){
     	        c.setVisible(true);
-    	}
-		//m_lblStatusLabel.setVisible(false);
-		//m_lblWelcomeLabel.setVisible(! m_lblStatusLabel.isVisible());
-		m_lblWelcomeLabel.setText("<html><font color = Black size=20><b>Welcome!</b></font></html>");
-		//m_lblStatusLabel.setText("");
+			}
+			m_lblWelcomeLabel.setText("<html><font color=black><b>Welcome!</b></font></html>");
+		}
+
 		FPU.Light.GREEN.off();
      	FPU.Light.RED.off();
 	}
+	
 	private void addComponentsToPane() {
 		createWelcomeLabel();
 		m_pMsg = new JPanel();
@@ -146,27 +171,33 @@ public class WelcomeForm extends JPanel {
             	System.out.println(strResult);
             	if (strResult.compareTo("Succeed!") == 0) {
                   	m_lblWelcomeLabel.setText("<html><font color=black>Punch Accepted!</font></html>");
+                  	if (m_bIsPiggyBack){
+                  		m_lblWelcomeLabel.setIcon(m_iconDoorOpen);
+                  	}
                   	m_lblWelcomeLabel.repaint();
                   	FPU.Light.RED.off();
                   	FPU.Light.GREEN.on();
                   	MainWindow.getM_ap().playSuccessSound();
                   } else {
                   	m_lblWelcomeLabel.setText("<html><font color=black>"+strResult+"</font></html>");
+                  	if (m_bIsPiggyBack){
+                  		m_lblWelcomeLabel.setIcon(m_iconDoorOpen);
+                  	}
                 	m_lblWelcomeLabel.repaint();
                   	FPU.Light.GREEN.off();
                   	FPU.Light.RED.on();
                   	MainWindow.getM_ap().playKeypadSound();
                   }
             } catch (InterruptedException e) {
-            	m_nIdThread.getAndDecrement();
+            	
                 // This is thrown if the thread's interrupted.
             } catch (ExecutionException e) {
-            	m_nIdThread.getAndDecrement();
+            	
                 // This is thrown if we throw an exception
                 // from doInBackground.
             } catch (CancellationException e) {
                 // Do your task after cancellation
-            	m_nIdThread.getAndDecrement();
+            	
             }
             m_nIdThread.getAndDecrement();
             m_idThreadTimer.start(); 
@@ -174,7 +205,8 @@ public class WelcomeForm extends JPanel {
     }
 	
 	protected void runIdThreadAgain() {
-		if (m_bRunIdThread && m_nIdThread.get()==0) {
+		System.out.println("m_nThread is "+FPIdWorker.m_nThread.get());
+		if (m_bRunIdThread && FPIdWorker.m_nThread.get()==0) {
 			updateLabel();
 			IdentifyEmp();
 		}
@@ -182,6 +214,17 @@ public class WelcomeForm extends JPanel {
 	
 	private void IdentifyEmp(){
 		m_idEmpWorker = new IdentifyEmployeeWorker();
+		//m_idEmpWorker = new FPIdWorker(m_lblWelcomeLabel,m_idThreadTimer);
 		m_idEmpWorker.execute();
 	}
+	
+	protected ImageIcon createImageIcon(String path, String description) {
+		java.net.URL imgURL = getClass().getResource(path);
+		if (imgURL != null) {
+			return new ImageIcon(imgURL, description);
+		} else {
+			System.err.println("Couldn't find file: " + path);
+			return null;
+		}
+}
 }
