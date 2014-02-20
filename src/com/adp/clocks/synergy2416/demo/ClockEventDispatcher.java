@@ -32,28 +32,24 @@ public class ClockEventDispatcher {
 	}
 	
 	private static CLOCK_STATUS m_prestatus;
-	private static CLOCK_STATUS m_status;
+	private CLOCK_STATUS m_status;
 	List<ClockStatusListener> listeners = new ArrayList<ClockStatusListener>();
 	
 	public void addListener(ClockStatusListener csl) {
 		listeners.add(csl);
 	}
 	
-	public void emit(CLOCK_STATUS cs){
+	private void emit(CLOCK_STATUS cs){
 		for (ClockStatusListener cl : listeners) {
 			cl.clockStatusChanged(cs);
 		}	
 	}
 	
-	public static CLOCK_STATUS getM_status() {
-		return m_status;
-	}
-
-	private void diffAndEmit(CLOCK_STATUS cs){
-		if (m_prestatus != cs) {
+	public void diffAndEmit(CLOCK_STATUS cs){
+		    m_status = cs;
   		    m_prestatus = cs;
-  		    emit(cs);
-  	    }
+  		
+		emit (cs);
 	}
 	
 	//Constructor
@@ -67,38 +63,40 @@ public class ClockEventDispatcher {
 		}
 		System.out.println("Changing clock status to ready ...");
   	  	m_status = CLOCK_STATUS.CLOCKSTATUS_READY;
-  	  	diffAndEmit(m_status);
+  	  	//diffAndEmit(m_status);
+  	  	emit(m_status);
   	  	System.out.println("Changing clock status to ready done.");
 	}
 
 	public void handlekeyPressed(KeyEvent e) {
 		
-		System.out.println("keypad pressed, play click sound.");
+		System.out.println("keypad pressed, status is "+m_status);
 		//MainWindow.getM_ap().playKeypadSound();
 		
 		switch(e.getKeyCode()){
 			case KeyEvent.VK_F1:			
 				m_status = CLOCK_STATUS.CLOCKSTATUS_VIDEO;
 				diffAndEmit(m_status);
+				
 				break;
 				
 			case KeyEvent.VK_F2:
 				m_status = CLOCK_STATUS.CLOCKSTATUS_WEBCAM;
 				diffAndEmit(m_status);
+	
 				break;
 				
 			case KeyEvent.VK_F3:
 				m_status = CLOCK_STATUS.CLOCKSTATUS_FINGERPRINT_ENROLL;
 				diffAndEmit(m_status);
-				//DemoFPU.Enroll();
-				//MainWindow.btnNewButton.requestFocus();
+				
 				break;
 				
 			case KeyEvent.VK_F4:
 				
 				m_status = CLOCK_STATUS.CLOCKSTATUS_FINGERPRINT_CONTROL;
 				diffAndEmit(m_status);
-				//DemoFPU.Verify();
+		
 				break;
 				
 			case KeyEvent.VK_F7:
@@ -133,6 +131,10 @@ public class ClockEventDispatcher {
 	
 	public CLOCK_STATUS clockStatus(){
     	return m_status;
+	}
+
+	public void setM_status(CLOCK_STATUS status) {
+		this.m_status = status;
 	}
 
 //	@Override

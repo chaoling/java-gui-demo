@@ -3,6 +3,8 @@ package com.adp.clocks.synergy2416.demo;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -27,11 +29,12 @@ public class VideoForm extends javax.swing.JPanel {
 	private int m_width = 320;
 	private int m_height = 220;
 	private JLabel m_lblInstructVideo;
-	private Timer m_VideoTimer;
+	private Timer m_killVideoTimer;
 	
 	class VideoTimerTask extends TimerTask {
 		public void run() {
-			m_VideoTimer.cancel();
+			System.out.format("Time's up!%n");
+			m_killVideoTimer.cancel();
 			try {
 				Runtime.getRuntime().exec( "killall -9 mplayer" );
 			} catch (IOException e1) {
@@ -40,9 +43,25 @@ public class VideoForm extends javax.swing.JPanel {
 			}
 		}
 	}
+	
+//	class AlTimer implements ActionListener {
+//	        @Override
+//	        public void actionPerformed(ActionEvent e) {
+//	        	System.out.println("kill sometngg...");
+//	        	//System.out.println("Timer status: "+m_killVideoTimer.isRunning());
+//	        	//m_killVideoTimer.stop();
+//	        	try {
+//					Runtime.getRuntime().exec( "killall -9 mplayer" );
+//				} catch (IOException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//	        }
+//	    }
+	
 	public VideoForm(MainWindow mw) {
     	this.m_mw = mw;
-    	m_VideoTimer = new Timer();
+    	//m_VideoTimer = new Timer();
     	setSize(m_width, m_height);
     	addComponentToPane();
     	setOpaque(false);
@@ -57,8 +76,6 @@ public class VideoForm extends javax.swing.JPanel {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				//MainWindow.getM_ap().playBeepSound();
-				//System.out.println("Pressed"+" " +e.getKeyCode());
 				
 				if(KeyEvent.VK_ENTER == e.getKeyCode() && m_instance == 0){
 					try {
@@ -125,8 +142,12 @@ public class VideoForm extends javax.swing.JPanel {
         		Process p = Runtime.getRuntime().exec( "killall -9 mplayer" );
         		p.waitFor();
         	}
-        	m_VideoTimer.schedule(new VideoTimerTask(), 45*1000L);
-        	Process mp = Runtime.getRuntime().exec( "mplayer -framedrop −really−quiet " + "./res/corn_15w.avi");
+        	//System.out.println("about to start Start timer!");
+        	//m_killVideoTimer = new Timer(50*1000, new AlTimer());
+        	m_killVideoTimer = new Timer();
+        	m_killVideoTimer.schedule(new VideoTimerTask(),50*1000L);
+        	//System.out.println("Timer status: "+m_killVideoTimer.isRunning());
+        	Process mp = Runtime.getRuntime().exec( "nice -n -8 mplayer -framedrop −really−quiet " + "./res/corn_15w.avi");
         	mp.waitFor();
         	m_instance = 0;
         }
@@ -166,7 +187,7 @@ public class VideoForm extends javax.swing.JPanel {
 	}
 	
 	private void checkFocus() {
-		if (ClockEventDispatcher.getM_status() == CLOCK_STATUS.CLOCKSTATUS_VIDEO) {
+		if (m_mw.getM_cel().clockStatus() == CLOCK_STATUS.CLOCKSTATUS_VIDEO) {
 			showPopUpDialog();
 		}
 	}

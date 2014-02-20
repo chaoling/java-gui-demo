@@ -153,7 +153,7 @@ public class MainWindow extends JFrame {
 
 	public void returnToMain() {
 		if (m_ced != null){
-		m_ced.emit(CLOCK_STATUS.CLOCKSTATUS_MENU);
+		m_ced.diffAndEmit(CLOCK_STATUS.CLOCKSTATUS_MENU);
 		}
 	}
 	

@@ -1,7 +1,7 @@
 package com.adp.clocks.synergy2416.demo;
 
 public final class FPU {  //implements FingerPrintEnrollmentHandler, Employee{
-
+	private static boolean m_bFingerisEnrolling = false;
 
 	static { System.loadLibrary("synergy2416"); }
 	private static class FPULoader {
@@ -146,8 +146,9 @@ public final class FPU {  //implements FingerPrintEnrollmentHandler, Employee{
 			return "Bad Finger Read";
 		case -104:
 			return "Finger did not match - The badge was found but the finger supplied for validation did not match to the template in the finger print sensor.";
+		case -5:
 		case -105:
-			return "Finger did not match - The supplied finger did not match any template in the finger print sensor";
+			return "Finger did not match"; //- The supplied finger did not match any template in the finger print sensor";
 		case -106:
 			return "Finger already enrolled";//"The finger you are trying to Enroll already exists in the finger print reader under a different badge."; // You must first delete this finger under the corresponding badge if you wish to enroll this finger under a new badge. You cannot have one finger associated with 2 different badges.";
 		case -107:
@@ -158,6 +159,8 @@ public final class FPU {  //implements FingerPrintEnrollmentHandler, Employee{
 			return "Bad Badge, The badge you entered is not supported";
 		case -110:
 			return "Finger print template failed to save to file";
+		case -111:
+			return "The Enrollment Function failed to return an error code";
 		default:
 			return Integer.toString(nRet);
 		}
@@ -199,7 +202,11 @@ public final class FPU {  //implements FingerPrintEnrollmentHandler, Employee{
   
   public static String enroll(String strBadgeNum, int nFingerNum, FingerPrintEnrollmentHandler fph) {
 	  //System.out.println("Enrolling "+strBadgeNum+" FingerNum: "+nFingerNum);
-	  return app_msgConvert(FPU.FP_ENROLE_EMPLOYEE(strBadgeNum,nFingerNum,(long)15000,(long)1000, fph));
+	  int enrollMessage = -111;
+	  m_bFingerisEnrolling = true;
+	  enrollMessage = FPU.FP_ENROLE_EMPLOYEE(strBadgeNum,nFingerNum,(long)15000,(long)1000, fph);
+	  m_bFingerisEnrolling = false;
+	  return app_msgConvert(enrollMessage);
   }
   public static String enrollCount() {
 	  return app_msgConvert(FPU.FP_GET_ENROLECOUNT());
@@ -231,14 +238,17 @@ public final class FPU {  //implements FingerPrintEnrollmentHandler, Employee{
   
   public static String identifyEmployee(){
 	  int nRet = FPU.FP_IDENTIFY_EMPLOYEE();
-	  while (nRet == -107) {
+	  while (nRet == -107 || nRet == -101) {
 		  try {
 			Thread.sleep(400);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		  if(!m_bFingerisEnrolling){
 		  nRet = FPU.FP_IDENTIFY_EMPLOYEE();
+		  }
+		  
 	  }
 	  return app_msgConvert(nRet);
   }

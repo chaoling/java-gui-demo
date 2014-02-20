@@ -33,10 +33,10 @@ public class WelcomeForm extends JPanel {
 	//private AtomicInteger m_nIdThread;
 	private boolean m_bRunIdThread;
 	//private IdentifyEmployeeWorker m_idEmpWorker;
-	private IdentifyEmployeeWorker m_idEmpWorker;
+	private static IdentifyEmployeeWorker m_idEmpWorker;
 	private static Timer m_idThreadTimer;
 	private boolean m_bIsPiggyBack; //PiggyBack on idControl form
-	public AtomicInteger m_nIdThread;
+	private static AtomicInteger m_nIdThread;
 	private ImageIcon m_iconDoorOpen;
 		
 	public boolean isM_bIsPiggyBack() {
@@ -102,15 +102,18 @@ public class WelcomeForm extends JPanel {
 	          public void focusGained(FocusEvent e){
 	        	  m_bRunIdThread = true;
 	              System.out.println(WelcomeForm.this.toString()+"Focus GAINED:"+e);
+	              if (m_idThreadTimer != null && m_idThreadTimer.isRunning()){
+	            	  m_idThreadTimer.stop();
+	              }
 	              runIdThreadAgain();
 	          }
 	          public void focusLost(FocusEvent e){
 	              System.out.println(WelcomeForm.this.toString()+"Focus LOST:"+e);
 	              m_bRunIdThread = false;
-	            
-	              if (m_idEmpWorker != null && ! m_idEmpWorker.isDone()) {
-	            	  m_idEmpWorker.cancel(true);
-	              }
+//	            
+//	              if (m_idEmpWorker != null && ! m_idEmpWorker.isDone()) {
+//	            	  m_idEmpWorker.cancel(true);
+//	              }
 	              if (m_idThreadTimer != null && m_idThreadTimer.isRunning()){
 	            	  m_idThreadTimer.stop();
 	              }
@@ -131,6 +134,7 @@ public class WelcomeForm extends JPanel {
 			for (Component c : m_mw.getM_ec().getM_pMenuBar().getComponents()){
     	        c.setVisible(true);
 			}
+			m_lblWelcomeLabel.setIcon(null);
 			m_lblWelcomeLabel.setText("<html><font color=black><b>Welcome!</b></font></html>");
 		}
 
@@ -166,7 +170,12 @@ public class WelcomeForm extends JPanel {
 
         @Override
         protected void done() {
-            try { 
+        	//ClockEventDispatcher.CLOCK_STATUS st = ClockEventDispatcher.getM_status();
+        	ClockEventDispatcher.CLOCK_STATUS st = WelcomeForm.this.m_mw.getM_cel().clockStatus();
+        	System.out.print("status is "+st);
+			if (st == ClockEventDispatcher.CLOCK_STATUS.CLOCKSTATUS_MENU || st == ClockEventDispatcher.CLOCK_STATUS.CLOCKSTATUS_FINGERPRINT_CONTROL ||st == ClockEventDispatcher.CLOCK_STATUS.CLOCKSTATUS_READY)
+			{
+				try { 
             	String strResult = get();
             	System.out.println(strResult);
             	if (strResult.compareTo("Succeed!") == 0) {
@@ -197,16 +206,24 @@ public class WelcomeForm extends JPanel {
                 // from doInBackground.
             } catch (CancellationException e) {
                 // Do your task after cancellation
+            	m_nIdThread.getAndDecrement();
+                return;
             	
             }
+        }
+            
             m_nIdThread.getAndDecrement();
             m_idThreadTimer.start(); 
         }
     }
 	
 	protected void runIdThreadAgain() {
-		System.out.println("m_nThread is "+FPIdWorker.m_nThread.get());
-		if (m_bRunIdThread && FPIdWorker.m_nThread.get()==0) {
+		System.out.println("m_nThread is "+m_nIdThread.get());
+		if (m_idEmpWorker != null){
+		System.out.println("thread is done? "+m_idEmpWorker.isDone());
+		System.out.println("thtread is cancelled? "+m_idEmpWorker.isCancelled());
+		}
+		if (m_idEmpWorker == null || (m_bRunIdThread && m_idEmpWorker.isDone())) {
 			updateLabel();
 			IdentifyEmp();
 		}

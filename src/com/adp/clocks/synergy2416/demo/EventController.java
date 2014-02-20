@@ -269,11 +269,6 @@ public class EventController implements ClockStatusListener {
 	    m_cards.show(m_cardPanel, "welcome");
 	    m_welcomeForm.updateLabel();
 	    m_welcomeForm.requestFocusInWindow();
-//	    //new FingerPrintDemoForm(m_frame);
-//	    m_cards.show(m_cardPanel, "fpControl");
-//	    m_fingerPrintControlForm.updateLabel();
-//	    m_fingerPrintControlForm.setFocusable(true);
-//	    m_fingerPrintControlForm.requestFocusInWindow();
 	}
 	public void loadSysInforForm()
 	{
@@ -289,7 +284,9 @@ public class EventController implements ClockStatusListener {
 	 */
 	
 	public void returnToMain() {
+		
 		switch (m_curStatus) {
+		
 		case CLOCKSTATUS_FAULT:
 			//loadClockFaultForm();
 			break;
