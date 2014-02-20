@@ -266,13 +266,12 @@ public class EventController implements ClockStatusListener {
 	}
 	public void loadFingerPrintControlForm()
 	{
-	    System.out.println("Loading FingerPrint Validation Form");
+	    System.out.println("Loading FingerPrint Control Form");
 	    //new FingerPrintDemoForm(m_frame);
 	    m_cards.show(m_cardPanel, "fpControl");
 	    m_fingerPrintControlForm.updateLabel();
 	    m_fingerPrintControlForm.setFocusable(true);
 	    m_fingerPrintControlForm.requestFocusInWindow();
-	    //m_fingerPrintControlForm.goDemo();
 	}
 	public void loadSysInforForm()
 	{
