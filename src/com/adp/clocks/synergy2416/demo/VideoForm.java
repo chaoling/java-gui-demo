@@ -8,6 +8,8 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -25,9 +27,22 @@ public class VideoForm extends javax.swing.JPanel {
 	private int m_width = 320;
 	private int m_height = 220;
 	private JLabel m_lblInstructVideo;
+	private Timer m_VideoTimer;
 	
+	class VideoTimerTask extends TimerTask {
+		public void run() {
+			m_VideoTimer.cancel();
+			try {
+				Runtime.getRuntime().exec( "killall -9 mplayer" );
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+	}
 	public VideoForm(MainWindow mw) {
     	this.m_mw = mw;
+    	m_VideoTimer = new Timer();
     	setSize(m_width, m_height);
     	addComponentToPane();
     	setOpaque(false);
@@ -78,6 +93,9 @@ public class VideoForm extends javax.swing.JPanel {
 					}
 					m_mw.returnToMain();
 				}
+				else {
+					m_mw.getM_cel().handlekeyPressed(e);
+				}
 				
 			}
 
@@ -107,6 +125,7 @@ public class VideoForm extends javax.swing.JPanel {
         		Process p = Runtime.getRuntime().exec( "killall -9 mplayer" );
         		p.waitFor();
         	}
+        	m_VideoTimer.schedule(new VideoTimerTask(), 45*1000L);
         	Process mp = Runtime.getRuntime().exec( "mplayer -framedrop −really−quiet " + "./res/corn_15w.avi");
         	mp.waitFor();
         	m_instance = 0;
@@ -121,7 +140,10 @@ public class VideoForm extends javax.swing.JPanel {
 	}
 
 	public void updateLabel(){
-    	m_mw.getM_ec().getM_lblInstruction().setText("<html><font color=black>Finger Print Enrollment</font> </html>");
+		m_mw.getM_ec().getLblVideoImage().setVisible(true);
+		m_mw.getM_ec().getLblCameraImage().setVisible(false);
+		m_mw.getM_ec().getLblFpuEnrollImage().setVisible(false);
+		m_mw.getM_ec().getLblFpuControlImage().setVisible(false);
     }
 
 	public void addComponentToPane() {

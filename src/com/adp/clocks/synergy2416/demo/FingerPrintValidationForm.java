@@ -22,9 +22,7 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 
-import com.adp.clocks.synergy2416.demo.ClockEventDispatcher.CLOCK_STATUS;
-
-public class FingerPrintValidationForm extends JPanel implements Employee {
+public class FingerPrintValidationForm extends JPanel {
 	
     /**
 	 * 
@@ -124,12 +122,15 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				System.out.println("Pressed"+" " +e.getKeyCode());
+				System.out.println(this.toString()+"Pressed"+" " +e.getKeyCode());
 				
 				if( KeyEvent.VK_F7 == e.getKeyCode()){
 					FingerPrintValidationForm.this.clearForm();
-			        m_mw.getM_cel().emit(CLOCK_STATUS.CLOCKSTATUS_MENU);
+			        m_mw.returnToMain();
 			        
+				}
+				else {
+					m_mw.getM_cel().handlekeyPressed(e);
 				}
 			}
 
@@ -143,11 +144,11 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
     	
     	this.addFocusListener(new FocusListener(){
 	          public void focusGained(FocusEvent e){
-	              System.out.println(this.toString()+"Focus GAINED:"+e);
+	              //System.out.println(this.toString()+"Focus GAINED:"+e);
 	          }
 	          public void focusLost(FocusEvent e){
 	        	  FingerPrintValidationForm.this.clearForm();
-	              System.out.println(this.toString()+"Focus LOST:"+e);
+	              //System.out.println(this.toString()+"Focus LOST:"+e);
 	              
 	          }
 	      });
@@ -155,7 +156,14 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
     
     public void updateLabel()
     {
-    	m_mw.getM_ec().getM_lblInstruction().setText("<html><font color=black>Finger Print Verification</font> </html>");
+    	//m_mw.getM_ec().getM_lblInstruction().setText("<html><font color=black>Finger Print Verification</font> </html>");
+    	for (Component c : m_mw.getM_ec().getM_pMenuBar().getComponents()){
+    		if (c.getName().contains(this.getName())) {
+    	        c.setVisible(true);
+    		} else {
+    			c.setVisible(false);
+    		}
+    	}
     }
 
 	public void addComponentToPane() {
@@ -229,14 +237,6 @@ public class FingerPrintValidationForm extends JPanel implements Employee {
         //add(card2,DEMO_FPN);
         add(card3,DEMO_STATUS);
     }
-
-	@Override
-	public void setBadge(String badge) {
-		// TODO Auto-generated method stub
-		System.out.println("Employee Identified: "+badge);
-		m_lblStatus.setText("Employee Identified: "+ "<html><font Color=red>"+ badge +"</font></html>");
-		
-	}
 
 //	public void setStepCount(int count) {
 //		// TODO Auto-generated method stub

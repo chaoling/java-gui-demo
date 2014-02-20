@@ -2,7 +2,6 @@ package com.adp.clocks.synergy2416.demo;
 
 
 import java.awt.Component;
-import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,7 @@ import javax.swing.JTextField;
  * such as keypad press, hid input, finger print event, webcam, etc.
  *
  */
-public class ClockEventDispatcher implements KeyEventDispatcher {
+public class ClockEventDispatcher {
 	
 	
 	public enum CLOCK_STATUS
@@ -26,7 +25,7 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 	    CLOCKSTATUS_WEBCAM,
 	    CLOCKSTATUS_LED,
 	    CLOCKSTATUS_FINGERPRINT_ENROLL,
-	    CLOCKSTATUS_FINGERPRINT_DEMO,
+	    CLOCKSTATUS_FINGERPRINT_CONTROL,
 	    CLOCKSTATUS_SYSINFO,
 	    CLOCKSTATUS_MENU,
 	    CLOCKSTATUS_READY
@@ -74,8 +73,8 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 
 	public void handlekeyPressed(KeyEvent e) {
 		
-		//System.out.println("keypad pressed, play click sound.");
-		MainWindow.getM_ap().playKeypadSound();
+		System.out.println("keypad pressed, play click sound.");
+		//MainWindow.getM_ap().playKeypadSound();
 		
 		switch(e.getKeyCode()){
 			case KeyEvent.VK_F1:			
@@ -97,7 +96,7 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 				
 			case KeyEvent.VK_F4:
 				
-				m_status = CLOCK_STATUS.CLOCKSTATUS_FINGERPRINT_DEMO;
+				m_status = CLOCK_STATUS.CLOCKSTATUS_FINGERPRINT_CONTROL;
 				diffAndEmit(m_status);
 				//DemoFPU.Verify();
 				break;
@@ -118,7 +117,7 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
 			case KeyEvent.VK_F6:
 				//OUT key sequence starts with F6 (keyCode 117)
 			case KeyEvent.VK_ENTER:
-				break;
+		
 			case KeyEvent.VK_ESCAPE:
 				Component source = e.getComponent();
 		         if (source instanceof JTextField){
@@ -136,20 +135,20 @@ public class ClockEventDispatcher implements KeyEventDispatcher {
     	return m_status;
 	}
 
-	@Override
-	public boolean dispatchKeyEvent(KeyEvent e) {
-		
-		//System.out.println("Key Char: "+ e.getKeyChar() +" Key Code:  "+ (int) e.getKeyCode());
-		//Component comp = e.getComponent();
-		//KeyboardFocusManager.getCurrentKeyboardFocusManager().redispatchEvent(comp,e);
-	    if (e.getID() == KeyEvent.KEY_PRESSED) {
-	    	handlekeyPressed(e);
-            System.out.println("key pressed");
-        } else if (e.getID() == KeyEvent.KEY_RELEASED) {
-            System.out.println("key released");
-        } else if (e.getID() == KeyEvent.KEY_TYPED) {
-           //TODO
-        }
-		return false;
-	}
+//	@Override
+//	public boolean dispatchKeyEvent(KeyEvent e) {
+//		
+//		//System.out.println("Key Char: "+ e.getKeyChar() +" Key Code:  "+ (int) e.getKeyCode());
+//		//Component comp = e.getComponent();
+//		//KeyboardFocusManager.getCurrentKeyboardFocusManager().redispatchEvent(comp,e);
+//	    if (e.getID() == KeyEvent.KEY_PRESSED) {
+//	    	handlekeyPressed(e);
+//            //System.out.println("key pressed");
+//        } else if (e.getID() == KeyEvent.KEY_RELEASED) {
+//            //System.out.println("key released");
+//        } else if (e.getID() == KeyEvent.KEY_TYPED) {
+//           //TODO
+//        }
+//		return false;
+//	}
 }

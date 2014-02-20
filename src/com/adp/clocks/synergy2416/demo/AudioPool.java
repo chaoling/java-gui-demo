@@ -13,13 +13,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-//public static DemoSound greetingsound = new DemoSound("res/hello.wav");
-//public static DemoSound enrollsound = new DemoSound("res/Enroll.wav");
-//public static DemoSound beepsound = new DemoSound("res/beep.wav");
-//public static DemoSound placefingersound = new DemoSound("res/fingerPlace.wav");
-//public static DemoSound placefingeragainsound = new DemoSound("res/fingerPlaceAgain.wav");
-//public static DemoSound keypadsound = new DemoSound("res/KeyAccept.wav");
-//public static DemoSound successbuzzersound = new DemoSound("res/SuccessBuzzer.wav");        
+        
 
 public class AudioPool {
 	
@@ -45,7 +39,7 @@ public void reloadAudioSounds() {
     //this.beepsound = new WavePlayer(this.getClass().getResource(ResPath+"beep.wav"));
     //this.placefingersound = new WavePlayer(this.getClass().getResource(ResPath+"fingerPlace.wav"));
     //this.placefingeragainsound = new WavePlayer(this.getClass().getResource(ResPath+"fingerPlaceAgain.wav"));
-    this.keypadsound = new WavePlayer(this.getClass().getResource(ResPath+"0.wav"));
+    this.keypadsound = new WavePlayer(this.getClass().getResource(ResPath+"KeyAccepted.wav"));
     this.successbuzzersound = new WavePlayer(this.getClass().getResource(ResPath+"SuccessBuzzer.wav"));
 }
 

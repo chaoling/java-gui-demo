@@ -74,7 +74,10 @@ public class ShowWebCamForm  extends JPanel implements CaptureCallback{
 	}
 	
 	public void updateLabel(){
-		m_mw.getM_ec().getM_lblInstruction().setText("<html><Font color=black>Show WebCam Demo</Font></html>"); 
+		m_mw.getM_ec().getLblVideoImage().setVisible(false);
+		m_mw.getM_ec().getLblCameraImage().setVisible(true);
+		m_mw.getM_ec().getLblFpuEnrollImage().setVisible(false);
+		m_mw.getM_ec().getLblFpuControlImage().setVisible(false);
 	}
 	
 	public void initialize(){
@@ -141,7 +144,7 @@ public class ShowWebCamForm  extends JPanel implements CaptureCallback{
 			@Override
 			public void keyPressed(KeyEvent e) {
 				m_bStreamVideo = false;
-				System.out.println("Pressed"+" " +e.getKeyCode());
+				System.out.println("Webcam form Pressed"+" " +e.getKeyCode());
 				if( KeyEvent.VK_F5 == e.getKeyCode()){
 					getSnapshot();
 					ShowWebCamForm.this.setVisible(true);
@@ -155,7 +158,11 @@ public class ShowWebCamForm  extends JPanel implements CaptureCallback{
 				if( KeyEvent.VK_F7 == e.getKeyCode()){
 					System.out.println("Cam Closed");
 					ShowWebCamForm.this.setVisible(false);
-					ShowWebCamForm.this.cleanupCapture();
+					//ShowWebCamForm.this.cleanupCapture();
+					m_mw.returnToMain();
+				}
+				else {
+					m_mw.getM_cel().handlekeyPressed(e);
 				}
 			}
 

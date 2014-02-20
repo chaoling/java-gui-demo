@@ -6,7 +6,6 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
-import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Robot;
 import java.awt.SplashScreen;
@@ -124,8 +123,8 @@ public class MainWindow extends JFrame {
 		m_ced.initialize();
 		
 		
-		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-        manager.addKeyEventDispatcher(m_ced);
+//		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+//        manager.addKeyEventDispatcher(m_ced);
         m_frame.addFocusListener(new FocusListener(){
             public void focusGained(FocusEvent e){
                 System.out.println("Focus GAINED:"+e);

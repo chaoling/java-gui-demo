@@ -4,25 +4,21 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 
-public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollmentHandler, Employee {
+public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollmentHandler, KeyListener{
 	
     /**
 	 * 
@@ -68,7 +64,7 @@ public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollme
                 	
                 	FPU.Light.RED.off();
                 	FPU.Light.GREEN.on();
-                	MainWindow.getM_ap().playSuccessSound();
+                	MainWindow.getM_ap().playEnrollSound();
                 } else {
                 	
                 	FPU.Light.GREEN.off();
@@ -80,51 +76,51 @@ public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollme
         }
     }
     
+//    class txtFieldListener implements ActionListener {
+//
+//		@Override
+//		public void actionPerformed(ActionEvent e) {
+//			// TODO Auto-generated method stub
+//			System.out.println(e.getSource().toString());
+//			if (e.getSource() == m_txtEmployeeNum ){
+//				FingerPrintEnrollForm.this.m_strEmployeeNum = m_txtEmployeeNum.getText();
+//	        	if (m_strEmployeeNum != null){
+//	        		m_cl.next(FingerPrintEnrollForm.this);
+//	        		m_lblEnrollmentStatus.setText("Employee ID: "+m_strEmployeeNum+" Finger: "+m_nFingerNum);
+//	        		m_lblEnrollmentStatus.requestFocusInWindow();
+//	        		(new FingerPrintEnroll()).execute(); //Swing worker class.
+//	        	}		
+//			}
+//       }
+//    }
+    
     public FingerPrintEnrollForm(MainWindow mw) {
     	this.m_mw = mw;
     	//m_bContinue = true;
     	setSize(m_width, m_height);
     	addComponentToPane();
     	//attachKeyListeners();
-    	setOpaque(false);
-    	this.addKeyListener(new KeyListener(){
-
-			@Override
-			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				
-				if( KeyEvent.VK_F7 == e.getKeyCode()){
-					FingerPrintEnrollForm.this.clearForm();
-			        m_mw.returnToMain();
-				}
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-		});
+    	setOpaque(false);	
     	
     	this.addFocusListener(new FocusListener(){
 	          public void focusGained(FocusEvent e){
-	              //System.out.println(this.toString()+"Focus GAINED:"+e);
+	              System.out.println(this.toString()+"Focus GAINED:"+e);
 	          }
 	          public void focusLost(FocusEvent e){
 	        	  FingerPrintEnrollForm.this.clearForm();
-	              //System.out.println(this.toString()+"Focus LOST:"+e);
+	              System.out.println(this.toString()+"Focus LOST:"+e);
 	          }
 	      });
+    	
+    	m_txtEmployeeNum.addKeyListener(this);
+    	m_lblEnrollmentStatus.addKeyListener(this);
     }
 
     public void updateLabel(){
-    	m_mw.getM_ec().getM_lblInstruction().setText("<html><font color=black>Finger Print Enrollment</font> </html>");
+    	m_mw.getM_ec().getLblVideoImage().setVisible(false);
+		m_mw.getM_ec().getLblCameraImage().setVisible(false);
+		m_mw.getM_ec().getLblFpuEnrollImage().setVisible(true);
+		m_mw.getM_ec().getLblFpuControlImage().setVisible(false);
     }
 
 	public void addComponentToPane() {
@@ -174,6 +170,7 @@ public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollme
         m_txtEnrollmentResult.setOpaque(false);
         m_txtEnrollmentResult.setForeground(Color.white);
         m_txtEnrollmentResult.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
         JPanel textBoxPanel3 = new JPanel();
         textBoxPanel3.setSize(m_width, m_height);
         textBoxPanel3.setLayout(new BoxLayout(textBoxPanel3, BoxLayout.Y_AXIS));
@@ -196,13 +193,6 @@ public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollme
         //add(card2,PANEL_FPN);
         add(card3,PANEL_STATUS);
     }
-
-	@Override
-	public void setBadge(String badge) {
-		// TODO Auto-generated method stub
-		System.out.println("Employee Identified: "+badge);
-		
-	}
 
 	@Override
 	public void setStepCount(int count) {
@@ -245,7 +235,6 @@ public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollme
 		
 	}
 	
-	@SuppressWarnings("serial")
 	public void goDemo() {
 		m_cl.first(this);
 		setFocusable(true);
@@ -253,18 +242,20 @@ public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollme
     		m_txtEmployeeNum.requestFocus();
     	}
 		//System.out.println("goEnroll!");
-		setInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, getInputMap());
-	    KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
-	    getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(key, "pressed");
-	    getActionMap().put("pressed", new AbstractAction(){         
-
-			public void actionPerformed(ActionEvent arg0) {
-				m_strCurrentCardName = FingerPrintEnrollForm.this.getCurrentCardName();
-	            //System.out.println("Key Enter pressed, I am in "+m_strCurrentCardName);
-	            FingerPrintEnrollForm.this.handleAction();
-			} 
-	    });
+//		setInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, getInputMap());
+//	    KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+//	    getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(key, "pressed");
+//	    getActionMap().put("pressed", new AbstractAction(){         
+//
+//			public void actionPerformed(ActionEvent arg0) {
+//				m_strCurrentCardName = FingerPrintEnrollForm.this.getCurrentCardName();
+//	            //System.out.println("Key Enter pressed, I am in "+m_strCurrentCardName);
+//	            FingerPrintEnrollForm.this.handleAction();
+//			} 
+//	    });
 	}
+	
+	
 	
 	private String getCurrentCardName(){
 		for (Component comp : this.getComponents()) {
@@ -273,10 +264,11 @@ public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollme
 				return myName;
 			}
 		}
-		return "Invalid";
+		return "unknown";
 	}
 	
 	private void handleAction(){
+		m_strCurrentCardName = FingerPrintEnrollForm.this.getCurrentCardName();
 		switch(CardNames.valueOf(m_strCurrentCardName)){
         case Input_Employee_ID:
         	m_strEmployeeNum = m_txtEmployeeNum.getText();
@@ -319,5 +311,34 @@ public class FingerPrintEnrollForm extends JPanel implements FingerPrintEnrollme
 		m_txtEmployeeNum.setText("");
 		//m_txtFingerNum.setText("");
 		m_txtEnrollmentResult.setText("");
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		System.out.println(this.toString()+"key typed"+e.getKeyCode());
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		System.out.println(this.toString()+"key pressed"+e.getKeyCode());
+	
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		System.out.println(this.toString()+"key released"+e.getKeyCode());
+		if( KeyEvent.VK_F7 == e.getKeyCode()){
+			FingerPrintEnrollForm.this.clearForm();
+	        m_mw.returnToMain();
+		}
+		if (KeyEvent.VK_ENTER == e.getKeyCode()){
+			handleAction();
+		}
+		
+		else {
+			m_mw.getM_cel().handlekeyPressed(e);
+		}
+		
 	}
 }
